@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Operational & Audit Reports{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <div>
+        <h4 class="fw-bold text-white mb-0">Operational Reporting & Compliance</h4>
+        <p class="text-secondary small mb-0">Generate Excel-Compatible CSV Datasets and Executive PDF Summaries</p>
+    </div>
+</div>
+
+<!-- Report Configuration Form Card -->
+<div class="twin-card p-4 mb-4">
+    <h6 class="fw-bold text-white mb-3 d-flex align-items-center gap-2">
+        <i class="bi bi-sliders text-info"></i> Report Generator & Data Exporter
+    </h6>
+    <form method="GET" action="{{ url_for('reports.index') }}" id="report-filter-form">
+        <div class="row g-3">
+            <div class="col-12 col-md-4">
+                <label class="form-label small text-secondary fw-semibold">Report Category</label>
+                <select name="report_type" id="report_type" class="form-select form-scada">
+                    <option value="telemetry" {% if current_filters.report_type == 'telemetry' %}selected{% endif %}>1. Machine Telemetry Stream</option>
+                    <option value="production" {% if current_filters.report_type == 'production' %}selected{% endif %}>2. Production Output & Efficiency</option>
+                    <option value="status_history" {% if current_filters.report_type == 'status_history' %}selected{% endif %}>3. Machine State Transitions</option>
+                    <option value="anomaly" {% if current_filters.report_type == 'anomaly' %}selected{% endif %}>4. AI Anomaly Predictions & Risk</option>
+                    <option value="alerts" {% if current_filters.report_type == 'alerts' %}selected{% endif %}>5. Safety & Maintenance Alarms</option>
+                    <option value="daily_summary" {% if current_filters.report_type == 'daily_summary' %}selected{% endif %}>6. Executive Daily Factory Summary</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-4">
+                <label class="form-label small text-secondary fw-semibold">Target Machinery</label>
+                <select name="machine_id" id="machine_id" class="form-select form-scada">
+                    <option value="ALL">All Factory Machinery</option>
+                    <option value="Motor" {% if current_filters.machine_id == 'Motor' %}selected{% endif %}>Motor (Drive Induction Motor)</option>
+                    <option value="Conveyor" {% if current_filters.machine_id == 'Conveyor' %}selected{% endif %}>Conveyor (Belt Conveyor)</option>
+                    <option value="Pump" {% if current_filters.machine_id == 'Pump' %}selected{% endif %}>Pump (Cooling Pump)</option>
+                    <option value="CNC" {% if current_filters.machine_id == 'CNC' %}selected{% endif %}>CNC (5-Axis Milling Center)</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-2">
+                <label class="form-label small text-secondary fw-semibold">Start Date</label>
+                <input type="date" name="start_date" id="start_date" class="form-control form-scada" value="{{ current_filters.start_date }}">
+            </div>
+            <div class="col-12 col-md-2">
+                <label class="form-label small text-secondary fw-semibold">End Date</label>
+                <input type="date" name="end_date" id="end_date" class="form-control form-scada" value="{{ current_filters.end_date }}">
+            </div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mt-4 pt-3 border-top border-secondary">
+            <button type="submit" class="btn btn-sm btn-info text-dark fw-semibold">
+                <i class="bi bi-eye-fill me-1"></i> Preview Query Results
+            </button>
+            <button type="button" id="btn-export-csv" class="btn btn-sm btn-outline-success">
+                <i class="bi bi-file-earmark-spreadsheet-fill me-1"></i> Download CSV (Excel)
+            </button>
+            <button type="button" id="btn-export-pdf" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-file-earmark-pdf-fill me-1"></i> Download Executive PDF
+            </button>
+            <a href="{{ url_for('reports.index') }}" class="btn btn-sm btn-outline-secondary ms-auto">
+                Reset Filters
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Preview Table -->
+<div class="twin-card mb-4">
+    <div class="twin-card-header">
+        <h6 class="mb-0 fw-bold text-white d-flex align-items-center gap-2">
+            <i class="bi bi-table text-cyan"></i> Filtered Records Preview
+        </h6>
+        <span class="badge bg-dark border border-secondary text-secondary font-monospace small">
+            {{ rows|length }} Records Retrieved
+        </span>
+    </div>
+    <div class="table-responsive" style="max-height: 480px;">
+        <table class="table table-scada table-hover align-middle">
+            <thead class="sticky-top">
+                <tr>
+                    {% for h in headers %}
+                    <th>{{ h }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    {% for cell in row %}
+                    <td class="small font-monospace">{{ cell }}</td>
+                    {% endfor %}
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="{{ headers|length }}" class="text-center text-secondary py-4">
+                        No operational records found matching the active filter query.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Audit Trail of Generated Reports -->
+<div class="twin-card mb-4">
+    <div class="twin-card-header">
+        <h6 class="mb-0 fw-bold text-white"><i class="bi bi-clock-history text-secondary me-1"></i> Historical Generated Reports Audit</h6>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-scada table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Report Type</th>
+                    <th>Format</th>
+                    <th>Operator</th>
+                    <th>Records</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for evt in report_events %}
+                <tr>
+                    <td class="fw-semibold text-white small">{{ evt.report_type|upper }}</td>
+                    <td>
+                        <span class="badge {% if evt.file_format == 'PDF' %}bg-danger{% else %}bg-success{% endif %}" style="font-size: 0.65rem;">
+                            {{ evt.file_format }}
+                        </span>
+                    </td>
+                    <td class="small text-secondary">{{ evt.generated_by }}</td>
+                    <td class="small text-light font-monospace">{{ evt.record_count }}</td>
+                    <td class="small text-secondary font-monospace">{{ evt.timestamp }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-secondary py-3">No report export events recorded yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function triggerExport(format) {
+        const form = document.getElementById("report-filter-form");
+        const formData = new FormData(form);
+        const params = new URLSearchParams(formData);
+        const url = format === "csv" ? `/reports/export/csv?${params.toString()}` : `/reports/export/pdf?${params.toString()}`;
+        window.location.href = url;
+    }
+
+    document.getElementById("btn-export-csv")?.addEventListener("click", () => triggerExport("csv"));
+    document.getElementById("btn-export-pdf")?.addEventListener("click", () => triggerExport("pdf"));
+</script>
+{% endblock %}

@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}Asset Digital Twin - {{ machine_id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1 small">
+                <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}" class="text-info text-decoration-none">Central SCADA</a></li>
+                <li class="breadcrumb-item active text-secondary" aria-current="page">{{ machine_id }} Digital Twin</li>
+            </ol>
+        </nav>
+        <div class="d-flex align-items-center gap-2">
+            <h4 class="fw-bold text-white mb-0">{{ machine.name }} ({{ machine_id }})</h4>
+            <span id="detail-machine-status" class="badge-scada badge-scada-running">{{ machine.current_status }}</span>
+        </div>
+        <p class="text-secondary small mb-0"><i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ machine.location }} &bull; Asset Type: {{ machine.type }}</p>
+    </div>
+    <div class="d-flex align-items-center gap-2 mt-2 mt-sm-0">
+        <a href="{{ url_for('dashboard.index') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Central SCADA
+        </a>
+        <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#faultModal">
+            <i class="bi bi-lightning-charge-fill me-1"></i> Test Anomaly
+        </button>
+    </div>
+</div>
+
+<!-- Primary Telemetry Live SCADA Metrics -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="twin-card metric-box p-3 h-100">
+            <div class="metric-label">Temperature</div>
+            <div class="metric-value text-warning">
+                <span id="dt-temp">--</span><span class="metric-unit">°C</span>
+            </div>
+            <div class="small text-secondary mt-1" style="font-size: 0.72rem;">
+                Threshold: <span class="text-white">{{ machine.max_temp }}°C</span> (Base: {{ machine.base_temp }}°C)
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="twin-card metric-box p-3 h-100">
+            <div class="metric-label">Vibration Velocity</div>
+            <div class="metric-value text-info">
+                <span id="dt-vib">--</span><span class="metric-unit">mm/s</span>
+            </div>
+            <div class="small text-secondary mt-1" style="font-size: 0.72rem;">
+                Threshold: <span class="text-white">{{ machine.max_vibration }} mm/s</span> (Base: {{ machine.base_vibration }})
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="twin-card metric-box p-3 h-100">
+            <div class="metric-label">Drive Speed</div>
+            <div class="metric-value text-primary">
+                <span id="dt-rpm">--</span><span class="metric-unit">RPM</span>
+            </div>
+            <div class="small text-secondary mt-1" style="font-size: 0.72rem;">
+                Nominal: <span class="text-white">{{ machine.base_rpm }} RPM</span> (Max: {{ machine.max_rpm }})
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="twin-card metric-box p-3 h-100">
+            <div class="metric-label">Mechanical Load</div>
+            <div class="metric-value text-success">
+                <span id="dt-load">--</span><span class="metric-unit">%</span>
+            </div>
+            <div class="small text-secondary mt-1" style="font-size: 0.72rem;">
+                Limit: <span class="text-white">{{ machine.max_load }}%</span> (Base: {{ machine.base_load }}%)
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Isolation Forest Inference & Diagnostic Action Box -->
+<div class="twin-card mb-4 border-info">
+    <div class="twin-card-header bg-dark">
+        <h6 class="mb-0 fw-bold text-white d-flex align-items-center gap-2">
+            <i class="bi bi-cpu text-info"></i> AI Digital Twin Inference Engine (Isolation Forest)
+        </h6>
+        <span id="dt-ai-method" class="badge bg-secondary font-monospace" style="font-size: 0.7rem;">ISOLATION FOREST</span>
+    </div>
+    <div class="twin-card-body">
+        <div class="row align-items-center g-3">
+            <div class="col-12 col-md-4 text-center border-end-md border-secondary">
+                <div class="metric-label">Calculated Anomaly Risk Score</div>
+                <div class="display-5 fw-bold text-white font-monospace" id="dt-ai-score">--</div>
+                <div class="risk-meter mx-auto" style="max-width: 200px;">
+                    <div id="dt-ai-bar" class="risk-bar risk-bar-low" style="width: 15%;"></div>
+                </div>
+                <div class="mt-2">
+                    <span id="dt-ai-category" class="badge bg-success px-3 py-1">LOW RISK</span>
+                </div>
+            </div>
+            <div class="col-12 col-md-8">
+                <h6 class="text-secondary small fw-bold text-uppercase mb-1">Recommended Industrial Maintenance Action</h6>
+                <div class="p-3 rounded bg-dark border border-secondary" id="dt-ai-action">
+                    <i class="bi bi-info-circle text-info me-2"></i> Analyzing digital twin telemetry stream...
+                </div>
+                <small class="text-secondary d-block mt-2" style="font-size: 0.72rem;">
+                    * AI Inference analyzes 4-dimensional telemetry (Temperature, Vibration, Speed, Load) against learned normal distribution envelopes.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Historical Telemetry Real-Time Sensor Trends Chart -->
+<div class="twin-card mb-4">
+    <div class="twin-card-header">
+        <h6 class="mb-0 fw-bold text-white"><i class="bi bi-graph-up text-cyan me-1"></i> Multi-Parameter Sensor Synchronization</h6>
+        <span class="badge bg-dark border border-secondary text-secondary font-monospace small">Live Buffer</span>
+    </div>
+    <div class="p-3" style="height: 280px;">
+        <canvas id="machine-detail-chart"></canvas>
+    </div>
+</div>
+
+<!-- Two Column Log: Anomaly Predictions & Status Transitions -->
+<div class="row g-3 mb-4">
+    <!-- Recent Anomalies for this machine -->
+    <div class="col-12 col-lg-7">
+        <div class="twin-card h-100">
+            <div class="twin-card-header">
+                <h6 class="mb-0 fw-bold text-white"><i class="bi bi-exclamation-triangle text-warning me-1"></i> Recent Anomaly Predictions Log</h6>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-scada table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Score</th>
+                            <th>Risk</th>
+                            <th>Suggested Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dt-anomalies-tbody">
+                        <tr>
+                            <td colspan="4" class="text-center text-secondary py-3">Loading anomalies...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scheduled Maintenance Records -->
+    <div class="col-12 col-lg-5">
+        <div class="twin-card h-100">
+            <div class="twin-card-header">
+                <h6 class="mb-0 fw-bold text-white"><i class="bi bi-wrench-adjustable text-info me-1"></i> Scheduled Maintenance Plan</h6>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-scada table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Due Date</th>
+                            <th>Task</th>
+                            <th>Assigned</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for maint in maintenance %}
+                        <tr>
+                            <td class="small font-monospace text-secondary">{{ maint.scheduled_date }}</td>
+                            <td class="small text-white">{{ maint.maintenance_type }}</td>
+                            <td class="small text-secondary">{{ maint.performed_by or 'Team A' }}</td>
+                            <td><span class="badge bg-info text-dark" style="font-size: 0.65rem;">{{ maint.status }}</span></td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-secondary py-3">No maintenance scheduled.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const CURRENT_MACHINE_ID = "{{ machine_id }}";
+</script>
+<script src="{{ url_for('static', filename='js/machine_detail.js') }}"></script>
+{% endblock %}

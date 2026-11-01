@@ -1,0 +1,287 @@
+/* FactoryTwin (P_307) - Industrial SCADA Dark Theme */
+:root {
+  --bg-primary: #0b0f19;
+  --bg-secondary: #111827;
+  --bg-card: #1e293b;
+  --bg-card-hover: #243248;
+  --border-color: #334155;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --cyan-accent: #06b6d4;
+  --emerald-success: #10b981;
+  --amber-warning: #f59e0b;
+  --rose-danger: #f43f5e;
+  --purple-ai: #a855f7;
+  --blue-primary: #3b82f6;
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  font-family: var(--font-family);
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+/* Sidebar Styling */
+#sidebar {
+  width: 260px;
+  background-color: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1040;
+  transition: all 0.3s ease;
+}
+
+#sidebar .brand-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  background: rgba(15, 23, 42, 0.6);
+}
+
+#sidebar .nav-link {
+  color: var(--text-muted);
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+#sidebar .nav-link:hover {
+  color: var(--text-main);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+#sidebar .nav-link.active {
+  color: var(--cyan-accent);
+  background-color: rgba(6, 182, 212, 0.1);
+  border-left-color: var(--cyan-accent);
+}
+
+/* Content Area */
+#main-content {
+  margin-left: 260px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 991.98px) {
+  #sidebar {
+    margin-left: -260px;
+  }
+  #sidebar.show {
+    margin-left: 0;
+  }
+  #main-content {
+    margin-left: 0;
+  }
+}
+
+/* Top Navbar */
+.top-navbar {
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.75rem 1.5rem;
+}
+
+/* SCADA Glassmorphism Cards */
+.twin-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.twin-card:hover {
+  border-color: #475569;
+}
+
+.twin-card-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.twin-card-body {
+  padding: 1.25rem;
+}
+
+/* Badges & Indicators */
+.badge-scada {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem;
+  border-radius: 9999px;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+
+.badge-scada-running {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: var(--emerald-success);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-scada-warning {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: var(--amber-warning);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-scada-critical, .badge-scada-stopped {
+  background-color: rgba(244, 63, 94, 0.15);
+  color: var(--rose-danger);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+.badge-scada-idle {
+  background-color: rgba(148, 163, 184, 0.15);
+  color: var(--text-muted);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+/* Metric Display Blocks */
+.metric-box {
+  background-color: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.metric-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.metric-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-main);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.metric-unit {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+
+/* Anomaly Risk Gauge Bar */
+.risk-meter {
+  height: 8px;
+  border-radius: 4px;
+  background-color: #334155;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.risk-bar {
+  height: 100%;
+  transition: width 0.4s ease, background-color 0.4s ease;
+}
+
+.risk-bar-low {
+  background-color: var(--emerald-success);
+}
+.risk-bar-medium {
+  background-color: var(--amber-warning);
+}
+.risk-bar-high {
+  background-color: #f97316;
+}
+.risk-bar-critical {
+  background-color: var(--rose-danger);
+}
+
+/* Table Dark Industrial Styling */
+.table-scada {
+  color: var(--text-main);
+  border-color: var(--border-color);
+  margin-bottom: 0;
+}
+
+.table-scada th {
+  background-color: rgba(15, 23, 42, 0.8);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.75rem 1rem;
+}
+
+.table-scada td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+  vertical-align: middle;
+  font-size: 0.875rem;
+}
+
+.table-scada tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Custom Pulsing Status Dot */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.status-dot-pulse {
+  animation: pulse-dot 1.5s infinite;
+}
+
+@keyframes pulse-dot {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* Form Controls Dark */
+.form-scada {
+  background-color: #0f172a;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+}
+
+.form-scada:focus {
+  background-color: #0f172a;
+  border-color: var(--cyan-accent);
+  color: var(--text-main);
+  box-shadow: 0 0 0 0.25rem rgba(6, 182, 212, 0.2);
+}
+
+/* Modal Dark Styling */
+.modal-content-scada {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+}
+
+.modal-header-scada {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-footer-scada {
+  border-top: 1px solid var(--border-color);
+}

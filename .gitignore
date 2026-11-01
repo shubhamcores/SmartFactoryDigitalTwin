@@ -1,0 +1,45 @@
+# Python environment & cache
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+ENV/
+
+# Database files
+instance/
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment and sensitive configuration
+.env
+.env.local
+
+# ML Models and cache (trainable artifacts)
+*.joblib
+*.pkl
+
+# Generated reports & temp outputs
+reports/generated/*.csv
+reports/generated/*.pdf
+reports/generated/*.xlsx
+temp/
+tmp/
+*.log
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Test coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Archives
+*.zip
+*.tar.gz

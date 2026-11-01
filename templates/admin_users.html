@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}User Management (RBAC){% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <div>
+        <h4 class="fw-bold text-white mb-0">Role-Based User Management</h4>
+        <p class="text-secondary small mb-0">Configure Administrator and Plant Operator Access Controls</p>
+    </div>
+    <div>
+        <button class="btn btn-sm btn-info text-dark fw-semibold" data-bs-toggle="modal" data-bs-target="#createUserModal">
+            <i class="bi bi-person-plus-fill me-1"></i> Register New User
+        </button>
+    </div>
+</div>
+
+<!-- Users Table Card -->
+<div class="twin-card mb-4">
+    <div class="twin-card-header">
+        <h6 class="mb-0 fw-bold text-white"><i class="bi bi-people-fill text-info me-1"></i> Authorized Personnel Registry</h6>
+        <span class="badge bg-dark border border-secondary text-secondary small">{{ users|length }} Users</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-scada table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Full Name</th>
+                    <th>Email Address</th>
+                    <th>Role (RBAC)</th>
+                    <th>Created At</th>
+                    <th>Last Login</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td class="font-monospace text-secondary small">#{{ u.id }}</td>
+                    <td class="fw-semibold text-white font-monospace">{{ u.username }}</td>
+                    <td class="small text-light">{{ u.full_name }}</td>
+                    <td class="small text-secondary">{{ u.email or 'N/A' }}</td>
+                    <td>
+                        <span class="badge {% if u.role == 'admin' %}bg-danger{% else %}bg-primary{% endif %}" style="font-size: 0.68rem;">
+                            {{ u.role|upper }}
+                        </span>
+                    </td>
+                    <td class="small text-secondary font-monospace">{{ u.created_at }}</td>
+                    <td class="small text-secondary font-monospace">{{ u.last_login or 'Never' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Create User Modal -->
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-scada">
+            <div class="modal-header modal-header-scada">
+                <h6 class="modal-title fw-bold text-white">Register New System Account</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('admin.create_user') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary fw-semibold">Username</label>
+                        <input type="text" name="username" class="form-control form-scada" required placeholder="e.g. jdoe">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary fw-semibold">Full Name</label>
+                        <input type="text" name="full_name" class="form-control form-scada" required placeholder="e.g. John Doe">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary fw-semibold">Email Address</label>
+                        <input type="email" name="email" class="form-control form-scada" placeholder="jdoe@factory.local">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary fw-semibold">Assigned Role</label>
+                        <select name="role" class="form-select form-scada" required>
+                            <option value="operator">Operator (View SCADA, Acknowledge Alerts, Reports)</option>
+                            <option value="admin">Administrator (Full Plant Control, Simulation, User Admin)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary fw-semibold">Temporary Password</label>
+                        <input type="password" name="password" class="form-control form-scada" required placeholder="Minimum 6 characters">
+                    </div>
+                </div>
+                <div class="modal-footer modal-footer-scada">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-info text-dark fw-semibold">Create Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

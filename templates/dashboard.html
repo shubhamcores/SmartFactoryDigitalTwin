@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block title %}Central SCADA Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <div>
+        <h4 class="fw-bold text-white mb-0">Central Factory Digital Twin</h4>
+        <p class="text-secondary small mb-0">Real-Time Industrial IoT Telemetry & Unsupervised AI Anomaly Monitoring</p>
+    </div>
+    <div class="d-flex align-items-center gap-2 mt-2 mt-sm-0">
+        <span class="text-secondary small">Last Sync:</span>
+        <span id="last-updated-time" class="badge bg-dark border border-secondary text-info font-monospace">Synchronizing...</span>
+    </div>
+</div>
+
+<!-- Top KPI Summary Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="twin-card metric-box p-3 h-100">
+            <div class="metric-label">Monitored Assets</div>
+            <div class="metric-value text-info" id="kpi-total-machines">4</div>
+            <small class="text-secondary" style="font-size: 0.7rem;">Active Twins</small>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="twin-card metric-box p-3 h-100">
+            <div class="metric-label">Running Status</div>
+            <div class="metric-value text-success" id="kpi-running-machines">--</div>
+            <small class="text-secondary" style="font-size: 0.7rem;">Nominal Tolerance</small>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="twin-card metric-box p-3 h-100">
+            <div class="metric-label">Degraded / Warning</div>
+            <div class="metric-value text-warning" id="kpi-warning-machines">--</div>
+            <small class="text-secondary" style="font-size: 0.7rem;">Threshold Caution</small>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="twin-card metric-box p-3 h-100">
+            <div class="metric-label">Stopped / Trip</div>
+            <div class="metric-value text-danger" id="kpi-stopped-machines">--</div>
+            <small class="text-secondary" style="font-size: 0.7rem;">Off-line / E-Stop</small>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="twin-card metric-box p-3 h-100">
+            <div class="metric-label">Active Alarms</div>
+            <div class="metric-value text-danger" id="kpi-active-alerts">0</div>
+            <small class="text-secondary" style="font-size: 0.7rem;">Pending Action</small>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="twin-card metric-box p-3 h-100" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#dataSourceModal" title="Click to Switch Source between Synthetic and ESP32">
+            <div class="metric-label d-flex justify-content-between align-items-center">
+                <span>Feed Source</span>
+                <i class="bi bi-gear-fill text-secondary" style="font-size: 0.65rem;"></i>
+            </div>
+            <div class="metric-value text-info" id="kpi-data-source">SIMULATED</div>
+            <small class="text-info text-decoration-underline" style="font-size: 0.68rem;" id="kpi-source-sub">Click to Switch</small>
+        </div>
+    </div>
+</div>
+
+<!-- 4 Machine Digital Twin Grid -->
+<div class="row g-3 mb-4" id="machine-cards-container">
+    {% for machine_id, m in machines.items() %}
+    <div class="col-12 col-md-6 col-xl-3" id="card-col-{{ machine_id }}">
+        <div class="twin-card h-100">
+            <div class="twin-card-header">
+                <div>
+                    <div class="d-flex align-items-center gap-1">
+                        <h6 class="mb-0 fw-bold text-white">{{ machine_id }}</h6>
+                        <span id="badge-source-{{ machine_id }}" class="badge bg-dark border border-secondary text-info font-monospace" style="font-size: 0.6rem;">SIM</span>
+                    </div>
+                    <small class="text-secondary" style="font-size: 0.72rem;">{{ m.name }}</small>
+                </div>
+                <span id="badge-status-{{ machine_id }}" class="badge-scada badge-scada-running">RUNNING</span>
+            </div>
+            <div class="twin-card-body">
+                <!-- Real-Time Sensor Metrics -->
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <div class="metric-box">
+                            <div class="metric-label">Temp</div>
+                            <div class="metric-value text-warning">
+                                <span id="val-temp-{{ machine_id }}">--</span><span class="metric-unit">°C</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="metric-box">
+                            <div class="metric-label">Vibration</div>
+                            <div class="metric-value text-info">
+                                <span id="val-vib-{{ machine_id }}">--</span><span class="metric-unit">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="metric-box">
+                            <div class="metric-label">Speed</div>
+                            <div class="metric-value text-primary">
+                                <span id="val-rpm-{{ machine_id }}">--</span><span class="metric-unit">RPM</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="metric-box">
+                            <div class="metric-label">Load</div>
+                            <div class="metric-value text-success">
+                                <span id="val-load-{{ machine_id }}">--</span><span class="metric-unit">%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Isolation Forest Risk Meter -->
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-secondary fw-semibold" style="font-size: 0.7rem;">AI ANOMALY RISK</small>
+                        <span id="badge-risk-{{ machine_id }}" class="badge bg-success" style="font-size: 0.65rem;">LOW</span>
+                    </div>
+                    <div class="risk-meter">
+                        <div id="risk-bar-{{ machine_id }}" class="risk-bar risk-bar-low" style="width: 15%;"></div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-1 text-secondary" style="font-size: 0.65rem;">
+                        <span>Score: <b id="val-risk-score-{{ machine_id }}" class="text-white">0.0</b>/100</span>
+                        <span id="val-risk-method-{{ machine_id }}">Isolation Forest</span>
+                    </div>
+                </div>
+
+                <!-- Footer Card Link -->
+                <div class="d-flex justify-content-between align-items-center pt-2 border-top border-secondary">
+                    <small class="text-secondary" style="font-size: 0.72rem;">
+                        Units: <b id="val-prod-{{ machine_id }}" class="text-white">0</b>
+                    </small>
+                    <a href="{{ url_for('dashboard.machine_detail', machine_id=machine_id) }}" class="btn btn-sm btn-outline-info py-0 px-2" style="font-size: 0.75rem;">
+                        Twin Inspector <i class="bi bi-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Real-Time Industrial SCADA Charts (2x2 Grid) -->
+<div class="row g-3 mb-4">
+    <!-- Chart 1: Temperature -->
+    <div class="col-12 col-xl-6">
+        <div class="twin-card p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold text-white mb-0"><i class="bi bi-thermometer-half text-warning me-1"></i> Thermal Trends (°C)</h6>
+                <span class="badge bg-dark border border-secondary text-secondary" style="font-size: 0.65rem;">Real-Time Window</span>
+            </div>
+            <div style="height: 230px;">
+                <canvas id="chart-temperature"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart 2: Vibration -->
+    <div class="col-12 col-xl-6">
+        <div class="twin-card p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold text-white mb-0"><i class="bi bi-activity text-info me-1"></i> Vibration Velocity (mm/s)</h6>
+                <span class="badge bg-dark border border-secondary text-secondary" style="font-size: 0.65rem;">ISO 10816 Standard</span>
+            </div>
+            <div style="height: 230px;">
+                <canvas id="chart-vibration"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart 3: Speed & Load Correlation -->
+    <div class="col-12 col-xl-6">
+        <div class="twin-card p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold text-white mb-0"><i class="bi bi-speedometer2 text-primary me-1"></i> Drive Speed (RPM) Dynamics</h6>
+                <span class="badge bg-dark border border-secondary text-secondary" style="font-size: 0.65rem;">Mechanical RPM</span>
+            </div>
+            <div style="height: 230px;">
+                <canvas id="chart-speed"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart 4: Cumulative Production Output -->
+    <div class="col-12 col-xl-6">
+        <div class="twin-card p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold text-white mb-0"><i class="bi bi-boxes text-success me-1"></i> Production Output (Cumulative Units)</h6>
+                <span class="badge bg-dark border border-secondary text-secondary" style="font-size: 0.65rem;">Work-In-Progress</span>
+            </div>
+            <div style="height: 230px;">
+                <canvas id="chart-production"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Alerts Table Card -->
+<div class="twin-card mb-4">
+    <div class="twin-card-header">
+        <h6 class="mb-0 fw-bold text-white d-flex align-items-center gap-2">
+            <i class="bi bi-shield-exclamation text-danger"></i> Recent Operational & AI Anomaly Alerts
+        </h6>
+        <a href="{{ url_for('alerts.index') }}" class="btn btn-sm btn-outline-secondary" style="font-size: 0.75rem;">
+            View Full Log <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-scada table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Severity</th>
+                    <th>Asset</th>
+                    <th>Type</th>
+                    <th>Message & Diagnostic</th>
+                    <th>Timestamp</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="recent-alerts-tbody">
+                <tr>
+                    <td colspan="7" class="text-center text-secondary py-3">Loading live alerts...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

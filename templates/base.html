@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Digital Twin{% endblock %} - Smart Factory Digital Twin</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Custom Industrial SCADA Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar">
+        <div class="brand-header d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-cpu-fill text-info fs-4"></i>
+                <div>
+                    <h6 class="mb-0 fw-bold text-white tracking-wide">SMART FACTORY</h6>
+                    <small class="text-secondary" style="font-size: 0.68rem;">DIGITAL TWIN</small>
+                </div>
+            </div>
+            <span class="badge bg-dark border border-secondary text-info-emphasis" style="font-size: 0.65rem;">v1.0</span>
+        </div>
+
+        <div class="p-3">
+            <small class="text-uppercase fw-semibold text-secondary" style="font-size: 0.65rem; letter-spacing: 0.08em;">Factory Overview</small>
+        </div>
+        <nav class="nav flex-column mb-3">
+            <a class="nav-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}" href="{{ url_for('dashboard.index') }}">
+                <i class="bi bi-grid-1x2-fill"></i> Dashboard
+            </a>
+            <a class="nav-link {% if request.endpoint == 'alerts.index' %}active{% endif %}" href="{{ url_for('alerts.index') }}">
+                <i class="bi bi-bell-fill"></i> Alerts & Alarms
+                <span id="sidebar-alert-badge" class="badge rounded-pill bg-danger ms-auto" style="display: none;">0</span>
+            </a>
+            <a class="nav-link {% if request.endpoint == 'reports.index' %}active{% endif %}" href="{{ url_for('reports.index') }}">
+                <i class="bi bi-file-earmark-bar-graph-fill"></i> Reports & Audits
+            </a>
+        </nav>
+
+        <div class="px-3 pb-2">
+            <small class="text-uppercase fw-semibold text-secondary" style="font-size: 0.65rem; letter-spacing: 0.08em;">Digital Twin Assets</small>
+        </div>
+        <nav class="nav flex-column mb-3">
+            <a class="nav-link {% if request.view_args and request.view_args.get('machine_id') == 'Motor' %}active{% endif %}" href="{{ url_for('dashboard.machine_detail', machine_id='Motor') }}">
+                <i class="bi bi-gear-wide-connected text-primary"></i> Motor (Drive)
+            </a>
+            <a class="nav-link {% if request.view_args and request.view_args.get('machine_id') == 'Conveyor' %}active{% endif %}" href="{{ url_for('dashboard.machine_detail', machine_id='Conveyor') }}">
+                <i class="bi bi-arrows-expand text-success"></i> Conveyor (Handling)
+            </a>
+            <a class="nav-link {% if request.view_args and request.view_args.get('machine_id') == 'Pump' %}active{% endif %}" href="{{ url_for('dashboard.machine_detail', machine_id='Pump') }}">
+                <i class="bi bi-droplet-fill text-info"></i> Pump (Coolant)
+            </a>
+            <a class="nav-link {% if request.view_args and request.view_args.get('machine_id') == 'CNC' %}active{% endif %}" href="{{ url_for('dashboard.machine_detail', machine_id='CNC') }}">
+                <i class="bi bi-tools text-warning"></i> CNC (Milling)
+            </a>
+        </nav>
+
+        {% if session.get('role') == 'admin' %}
+        <div class="px-3 pb-2">
+            <small class="text-uppercase fw-semibold text-secondary" style="font-size: 0.65rem; letter-spacing: 0.08em;">Plant Administration</small>
+        </div>
+        <nav class="nav flex-column mb-4">
+            <a class="nav-link {% if request.endpoint == 'admin.users' %}active{% endif %}" href="{{ url_for('admin.users') }}">
+                <i class="bi bi-people-fill"></i> User Management
+            </a>
+            <a class="nav-link {% if request.endpoint == 'admin.audit' %}active{% endif %}" href="{{ url_for('admin.audit') }}">
+                <i class="bi bi-shield-lock-fill"></i> Audit Trails
+            </a>
+        </nav>
+        {% endif %}
+
+        <!-- MQTT & Telemetry Source Status Card -->
+        <div class="px-3 mt-auto mb-3">
+            <div class="p-2 rounded bg-dark border border-secondary" style="font-size: 0.72rem;">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <span class="text-secondary">Source:</span>
+                    <span id="nav-data-source" class="badge bg-primary text-white">SIMULATED</span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <span class="text-secondary">MQTT Broker:</span>
+                    <span id="nav-mqtt-status" class="text-warning">{% if config.MQTT_ENABLED %}Connected{% else %}Offline{% endif %}</span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                    <span class="text-secondary">Telemetry:</span>
+                    <span id="nav-telemetry-rate" class="text-success font-monospace">~3.0s</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div id="main-content">
+        <!-- Top SCADA Navbar -->
+        <header class="top-navbar d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-sm btn-outline-secondary d-lg-none" type="button" id="sidebar-toggler">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="status-dot status-dot-pulse bg-success" id="simulator-pulse"></span>
+                    <span class="fw-semibold text-white d-none d-sm-inline" id="simulator-status-text">Digital Twin Engine: Active</span>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <!-- Data Source Selection Modal Trigger -->
+                <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#dataSourceModal" id="btn-datasource-mode">
+                    <i class="bi bi-hdd-network-fill text-info"></i>
+                    <span class="d-none d-md-inline text-secondary small">Source:</span>
+                    <span id="top-datasource-text" class="fw-semibold text-info">SYNTHETIC</span>
+                </button>
+
+                <!-- Fault Injection Modal Trigger -->
+                <button type="button" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#faultModal">
+                    <i class="bi bi-lightning-charge-fill me-1"></i> Fault Simulator
+                </button>
+
+                {% if session.get('role') == 'admin' %}
+                <!-- Simulator Control Toggle Button -->
+                <button id="btn-toggle-sim" class="btn btn-sm btn-outline-info">
+                    <i class="bi bi-pause-fill"></i> Pause Simulation
+                </button>
+                {% endif %}
+
+                <!-- Active Alerts Quick Pill -->
+                <a href="{{ url_for('alerts.index') }}" class="btn btn-sm btn-outline-danger position-relative">
+                    <i class="bi bi-bell"></i>
+                    <span id="top-alert-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">0</span>
+                </a>
+
+                <!-- User Profile & RBAC Dropdown -->
+                <div class="dropdown ms-2">
+                    <button class="btn btn-sm btn-dark border border-secondary dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle text-info"></i>
+                        <span class="fw-medium text-white">{{ session.get('username', 'User') }}</span>
+                        <span class="badge {% if session.get('role') == 'admin' %}bg-danger{% else %}bg-secondary{% endif %}" style="font-size: 0.65rem;">
+                            {{ session.get('role', 'operator')|upper }}
+                        </span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark border-secondary shadow">
+                        <li class="dropdown-header text-secondary small">Signed in as <b>{{ session.get('full_name', session.get('username')) }}</b></li>
+                        <li><hr class="dropdown-divider border-secondary"></li>
+                        <li><a class="dropdown-item" href="{{ url_for('reports.index') }}"><i class="bi bi-file-earmark-text me-2"></i> Export Reports</a></li>
+                        <li><hr class="dropdown-divider border-secondary"></li>
+                        <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right me-2"></i> Sign Out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <!-- Flash Notifications -->
+        <div class="container-fluid px-4 pt-3">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show border-0 shadow-sm" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <!-- Page Specific Body Content -->
+        <main class="flex-grow-1 px-4 py-2">
+            {% block content %}{% endblock %}
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-auto py-3 px-4 border-top border-secondary text-secondary small d-flex flex-wrap justify-content-between align-items-center bg-dark">
+            <div>
+                <b>Digital Twin</b> &bull; AI-Driven Digital Twin for Smart Factory Operations &bull; HCLTech BTech Capstone Project
+            </div>
+            <div>
+                <span class="badge bg-secondary">Python 3.12</span>
+                <span class="badge bg-secondary">Flask</span>
+                <span class="badge bg-secondary">Isolation Forest</span>
+                <span class="badge bg-secondary">MQTT</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Fault Injection Modal (For Examiners & Live Demonstrations) -->
+    <div class="modal fade" id="faultModal" tabindex="-1" aria-labelledby="faultModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-scada">
+                <div class="modal-header modal-header-scada">
+                    <h5 class="modal-title d-flex align-items-center gap-2" id="faultModalLabel">
+                        <i class="bi bi-lightning-charge-fill text-warning"></i> Inject Industrial Fault / Scenario
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-secondary small mb-3">
+                        Select a digital twin machine and an abnormal physical regime to inject. The isolation forest anomaly detector and rule engine will react in real time.
+                    </p>
+                    <form id="fault-injection-form">
+                        <div class="mb-3">
+                            <label class="form-label small text-secondary fw-semibold">Target Machine</label>
+                            <select id="fault-machine-id" class="form-select form-scada">
+                                <option value="Motor">Motor (Main Induction Drive)</option>
+                                <option value="Conveyor">Conveyor (Belt Conveyor)</option>
+                                <option value="Pump">Pump  (Cooling Pump)</option>
+                                <option value="CNC">CNC (Precision Milling Center)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small text-secondary fw-semibold">Operational Regime to Inject</label>
+                            <select id="fault-condition" class="form-select form-scada">
+                                <option value="NORMAL">NORMAL (Clear Injected Faults)</option>
+                                <option value="HIGH_TEMP">HIGH TEMPERATURE (Coolant Failure / Overheating)</option>
+                                <option value="HIGH_VIB">HIGH VIBRATION (Bearing Race Degradation)</option>
+                                <option value="EXCESSIVE_LOAD">EXCESSIVE LOAD (Mechanical Jam / Drag)</option>
+                                <option value="REDUCED_PRODUCTION">REDUCED PRODUCTION (Line Starvation)</option>
+                                <option value="STOPPAGE">MACHINE STOPPAGE (Emergency E-Stop Trip)</option>
+                                <option value="ABNORMAL_SENSOR">ABNORMAL SENSOR SPIKE (Transient Sensor Glitch)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small text-secondary fw-semibold">Fault Duration (Simulation Cycles)</label>
+                            <input type="number" id="fault-duration" class="form-control form-scada" value="12" min="3" max="50">
+                            <small class="text-secondary">Machine will automatically return to normal operating baseline after cycle expiry.</small>
+                        </div>
+                    </form>
+                    <div id="fault-response-alert" class="alert alert-success d-none py-2 small" role="alert"></div>
+                </div>
+                <div class="modal-footer modal-footer-scada">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="btn-submit-fault" class="btn btn-warning btn-sm">
+                        <i class="bi bi-play-circle-fill me-1"></i> Apply Injected Regime
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Source Selection Modal (Synthetic Simulator vs ESP32 Hardware Node) -->
+    <div class="modal fade" id="dataSourceModal" tabindex="-1" aria-labelledby="dataSourceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content modal-content-scada">
+                <div class="modal-header modal-header-scada">
+                    <h5 class="modal-title d-flex align-items-center gap-2" id="dataSourceModalLabel">
+                        <i class="bi bi-hdd-network-fill text-info"></i> Telemetry Data Source Configuration
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-secondary small mb-3">
+                        Choose whether machine telemetry is generated by the <b>Internal Physics Simulator</b> or ingested live from physical/simulated <b>ESP32 Microcontroller Nodes</b>.
+                    </p>
+
+                    <div class="row g-3 mb-4">
+                        <!-- Option A: Synthetic Physics Simulator -->
+                        <div class="col-12 col-md-6">
+                            <div class="p-3 rounded border h-100" id="box-mode-synthetic" style="background: rgba(15, 23, 42, 0.6); border-color: #334155; cursor: pointer;">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="sourceModeChoice" id="radio-mode-synthetic" value="SYNTHETIC" checked>
+                                    <label class="form-check-label fw-bold text-white" for="radio-mode-synthetic">
+                                        <i class="bi bi-cpu-fill text-primary me-1"></i> Synthetic Physics Simulator
+                                    </label>
+                                </div>
+                                <p class="text-secondary small mt-2 mb-0">
+                                    Autonomous digital twin software engine. Generates continuous sensor telemetry modeling thermodynamics, rotational inertia, and mechanical load for all 4 machines. Zero hardware required.
+                                </p>
+                                <span class="badge bg-primary mt-2">Active Default</span>
+                            </div>
+                        </div>
+
+                        <!-- Option B: ESP32 Hardware Edge Node -->
+                        <div class="col-12 col-md-6">
+                            <div class="p-3 rounded border h-100" id="box-mode-esp32" style="background: rgba(15, 23, 42, 0.6); border-color: #334155; cursor: pointer;">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="sourceModeChoice" id="radio-mode-esp32" value="ESP32">
+                                    <label class="form-check-label fw-bold text-white" for="radio-mode-esp32">
+                                        <i class="bi bi-wifi text-success me-1"></i> ESP32 Hardware Edge Node
+                                    </label>
+                                </div>
+                                <p class="text-secondary small mt-2 mb-0">
+                                    Pauses synthetic generation for selected asset(s). The platform strictly awaits real sensor readings from an <b>ESP32 DevKit + MPU-6050 IMU</b> via MQTT or direct HTTP REST.
+                                </p>
+                                <span class="badge bg-success mt-2">Physical / Edge</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scope Selection -->
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary fw-semibold">Target Asset Scope</label>
+                        <select id="datasource-scope" class="form-select form-scada">
+                            <option value="ALL">All Factory Machinery (Global Mode)</option>
+                            <option value="Motor">Motor (Primary Drive Induction Motor)</option>
+                            <option value="Conveyor">Conveyor (Belt Conveyor)</option>
+                            <option value="Pump">Pump (Coolant Pump)</option>
+                            <option value="CNC">CNC (5-Axis Milling Center)</option>
+                        </select>
+                        <small class="text-secondary">You can set one machine (e.g. Motor) on ESP32 hardware while others run on simulation!</small>
+                    </div>
+
+                    <!-- ESP32 Connection Guide Card (Shown when ESP32 selected) -->
+                    <div id="esp32-connection-panel" class="p-3 rounded bg-dark border border-secondary mb-3">
+                        <h6 class="text-white small fw-bold mb-2"><i class="bi bi-broadcast text-info me-1"></i> ESP32 Ingestion Endpoints</h6>
+                        <div class="small text-secondary mb-2">
+                            <div>• <b>MQTT Topic</b>: <code class="text-info">factory/machines/Motor/telemetry</code> (QoS 1)</div>
+                            <div>• <b>HTTP REST Endpoint</b>: <code class="text-success" id="esp32-rest-url">http://127.0.0.1:5000/api/esp32/telemetry</code> (POST JSON)</div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between pt-2 border-top border-secondary">
+                            <small class="text-secondary">Want to test without physical hardware right now?</small>
+                            <button type="button" id="btn-send-esp32-test" class="btn btn-sm btn-outline-info">
+                                <i class="bi bi-send-fill me-1"></i> Send Test ESP32 Packet
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="datasource-feedback" class="alert alert-success d-none py-2 small" role="alert"></div>
+                </div>
+                <div class="modal-footer modal-footer-scada">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="btn-apply-datasource" class="btn btn-primary btn-sm">
+                        <i class="bi bi-check2-circle me-1"></i> Apply Data Source Mode
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+    <!-- Global Layout Scripts -->
+    <script>
+        // Sidebar Toggler for responsive screens
+        document.getElementById('sidebar-toggler')?.addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('show');
+        });
+
+        // Fault Injection Handler
+        document.getElementById('btn-submit-fault')?.addEventListener('click', async function() {
+            const machineId = document.getElementById('fault-machine-id').value;
+            const condition = document.getElementById('fault-condition').value;
+            const duration = parseInt(document.getElementById('fault-duration').value) || 12;
+
+            try {
+                const res = await fetch('/api/simulator/inject_fault', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ machine_id: machineId, condition: condition, duration_cycles: duration })
+                });
+                const data = await res.json();
+                const alertBox = document.getElementById('fault-response-alert');
+                alertBox.className = data.success ? 'alert alert-success py-2 small' : 'alert alert-danger py-2 small';
+                alertBox.textContent = data.message || (data.success ? 'Fault regime successfully injected!' : 'Fault injection failed.');
+                alertBox.classList.remove('d-none');
+                setTimeout(() => { alertBox.classList.add('d-none'); }, 4000);
+            } catch (err) {
+                console.error('Error injecting fault:', err);
+            }
+        });
+
+        // Simulator Toggle Handler (Admin)
+        document.getElementById('btn-toggle-sim')?.addEventListener('click', async function() {
+            const btn = this;
+            const isPaused = btn.innerText.includes('Resume');
+            const endpoint = isPaused ? '/api/simulator/start' : '/api/simulator/stop';
+            try {
+                const res = await fetch(endpoint, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    btn.innerHTML = isPaused ? '<i class="bi bi-pause-fill"></i> Pause Simulation' : '<i class="bi bi-play-fill"></i> Resume Simulation';
+                    btn.className = isPaused ? 'btn btn-sm btn-outline-info' : 'btn btn-sm btn-outline-success';
+                }
+            } catch (e) {
+                console.error('Failed to toggle simulator:', e);
+            }
+        });
+
+        // Global Alert Badge Polling
+        async function updateGlobalAlertBadge() {
+            try {
+                const res = await fetch('/api/alerts/count');
+                if (res.ok) {
+                    const data = await res.json();
+                    const count = data.new || 0;
+                    const topBadge = document.getElementById('top-alert-badge');
+                    const sideBadge = document.getElementById('sidebar-alert-badge');
+                    if (count > 0) {
+                        if (topBadge) { topBadge.textContent = count; topBadge.style.display = 'inline-block'; }
+                        if (sideBadge) { sideBadge.textContent = count; sideBadge.style.display = 'inline-block'; }
+                    } else {
+                        if (topBadge) topBadge.style.display = 'none';
+                        if (sideBadge) sideBadge.style.display = 'none';
+                    }
+                }
+            } catch (e) { /* ignore */ }
+        }
+        setInterval(updateGlobalAlertBadge, 4000);
+        updateGlobalAlertBadge();
+
+        // Data Source Mode Selection Handlers
+        const boxSynthetic = document.getElementById('box-mode-synthetic');
+        const boxESP32 = document.getElementById('box-mode-esp32');
+        const radioSynthetic = document.getElementById('radio-mode-synthetic');
+        const radioESP32 = document.getElementById('radio-mode-esp32');
+
+        boxSynthetic?.addEventListener('click', () => {
+            radioSynthetic.checked = true;
+            updateModeBoxStyles();
+        });
+        boxESP32?.addEventListener('click', () => {
+            radioESP32.checked = true;
+            updateModeBoxStyles();
+        });
+
+        function updateModeBoxStyles() {
+            if (radioSynthetic?.checked) {
+                boxSynthetic.style.borderColor = '#06b6d4';
+                boxSynthetic.style.background = 'rgba(6, 182, 212, 0.1)';
+                boxESP32.style.borderColor = '#334155';
+                boxESP32.style.background = 'rgba(15, 23, 42, 0.6)';
+            } else if (radioESP32?.checked) {
+                boxESP32.style.borderColor = '#10b981';
+                boxESP32.style.background = 'rgba(16, 185, 129, 0.1)';
+                boxSynthetic.style.borderColor = '#334155';
+                boxSynthetic.style.background = 'rgba(15, 23, 42, 0.6)';
+            }
+        }
+        updateModeBoxStyles();
+
+        // Update REST endpoint dynamically in modal
+        const restUrlEl = document.getElementById('esp32-rest-url');
+        if (restUrlEl) {
+            restUrlEl.textContent = `${window.location.origin}/api/esp32/telemetry`;
+        }
+
+        // Apply Data Source Mode
+        document.getElementById('btn-apply-datasource')?.addEventListener('click', async function() {
+            const selectedMode = document.querySelector('input[name="sourceModeChoice"]:checked')?.value || 'SYNTHETIC';
+            const scope = document.getElementById('datasource-scope')?.value || 'ALL';
+            const feedback = document.getElementById('datasource-feedback');
+
+            try {
+                const res = await fetch('/api/datasource/set_mode', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode: selectedMode, machine_id: scope })
+                });
+                const data = await res.json();
+                if (feedback) {
+                    feedback.className = data.success ? 'alert alert-success py-2 small' : 'alert alert-danger py-2 small';
+                    feedback.textContent = data.message || 'Mode updated successfully.';
+                    feedback.classList.remove('d-none');
+                    setTimeout(() => { feedback.classList.add('d-none'); }, 4000);
+                }
+                updateDataSourceUI();
+            } catch (err) {
+                console.error('Error setting data source mode:', err);
+            }
+        });
+
+        // Send Test ESP32 Edge Packet
+        document.getElementById('btn-send-esp32-test')?.addEventListener('click', async function() {
+            const scope = document.getElementById('datasource-scope')?.value;
+            const targetMachine = (scope && scope !== 'ALL') ? scope : 'Motor';
+            const feedback = document.getElementById('datasource-feedback');
+
+            try {
+                const res = await fetch('/api/esp32/test_packet', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ machine_id: targetMachine })
+                });
+                const data = await res.json();
+                if (feedback) {
+                    feedback.className = data.success ? 'alert alert-success py-2 small' : 'alert alert-danger py-2 small';
+                    feedback.textContent = data.message || 'Test ESP32 packet transmitted!';
+                    feedback.classList.remove('d-none');
+                    setTimeout(() => { feedback.classList.add('d-none'); }, 4000);
+                }
+            } catch (err) {
+                console.error('Error sending test packet:', err);
+            }
+        });
+
+        // Global Data Source Mode Polling
+        async function updateDataSourceUI() {
+            try {
+                const res = await fetch('/api/datasource/mode');
+                if (res.ok) {
+                    const data = await res.json();
+                    const globalMode = data.global_mode || 'SYNTHETIC';
+                    const topText = document.getElementById('top-datasource-text');
+                    const btn = document.getElementById('btn-datasource-mode');
+
+                    if (topText) {
+                        topText.textContent = globalMode === 'SYNTHETIC' ? 'SYNTHETIC' : (globalMode === 'ESP32' ? 'ESP32 EDGE' : 'HYBRID');
+                    }
+                    if (btn) {
+                        btn.className = globalMode === 'SYNTHETIC' 
+                            ? 'btn btn-sm btn-outline-primary d-flex align-items-center gap-1' 
+                            : 'btn btn-sm btn-outline-success d-flex align-items-center gap-1';
+                    }
+                }
+            } catch (e) { /* ignore */ }
+        }
+        setInterval(updateDataSourceUI, 5000);
+        updateDataSourceUI();
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
