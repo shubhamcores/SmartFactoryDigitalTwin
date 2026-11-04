@@ -20,6 +20,8 @@ instance/
 # ML Models and cache (trainable artifacts)
 *.joblib
 *.pkl
+!ai_model/isolation_forest_model.joblib
+!ai_model/scaler.joblib
 
 # Generated reports & temp outputs
 reports/generated/*.csv
