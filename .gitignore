@@ -1,4 +1,4 @@
-# Python environment & cache
+# Python environments and cache
 __pycache__/
 *.py[cod]
 *$py.class
@@ -12,18 +12,20 @@ instance/
 *.db
 *.sqlite
 *.sqlite3
+*.db-wal
+*.db-shm
 
 # Environment and sensitive configuration
 .env
 .env.local
 
-# ML Models and cache (trainable artifacts)
+# ML models
 *.joblib
 *.pkl
 !ai_model/isolation_forest_model.joblib
 !ai_model/scaler.joblib
 
-# Generated reports & temp outputs
+# Generated reports
 reports/generated/*.csv
 reports/generated/*.pdf
 reports/generated/*.xlsx
