@@ -37,14 +37,14 @@ const char* MQTT_BROKER   = "your-cluster-url.s1.eu.hivemq.cloud";
 const int   MQTT_PORT     = 8883; // 8883 for TLS, 1883 for Non-TLS
 const char* MQTT_USER     = "hivemq_device_user";
 const char* MQTT_PASS     = "hivemq_device_pass";
-const char* PUB_TOPIC     = "factory/machines/Motor_1/telemetry";
-const char* CLIENT_ID     = "ESP32_EdgeNode_Motor1";
+const char* PUB_TOPIC     = "factory/machines/Motor/telemetry";
+const char* CLIENT_ID     = "ESP32_EdgeNode_Motor";
 
 // HTTP REST Configuration (When USE_MQTT is false or as fallback)
 // Replace with the IP address of your Windows PC running app.py
 const char* HTTP_REST_URL = "http://192.168.1.8:5000/api/esp32/telemetry";
 
-const char* MACHINE_ID    = "Motor_1";
+const char* MACHINE_ID    = "Motor";
 
 // ============================================================================
 // HARDWARE PIN DEFINITIONS

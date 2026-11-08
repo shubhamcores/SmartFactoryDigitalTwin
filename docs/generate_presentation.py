@@ -77,10 +77,10 @@ def create_presentation():
             "title": "Monitored Industrial Machinery Assets",
             "subtitle": "Four Distinct Industrial Machine Twins",
             "bullets": [
-                "Motor_1: Primary Drive 3-Phase Induction Motor (1750 RPM nominal, 85°C limit, ISO 10816 4.5 mm/s vibration limit).",
-                "Conveyor_1: Material Handling Belt Conveyor (450 RPM nominal, 70°C limit, 3.8 mm/s vibration limit).",
-                "Pump_1: Cooling Circuit Centrifugal Water Pump (2900 RPM nominal, 80°C limit, 5.0 mm/s vibration limit).",
-                "CNC_1: 5-Axis Precision Milling Machining Center (2400 RPM nominal, 90°C limit, 5.5 mm/s vibration limit).",
+                "Motor: Primary Drive 3-Phase Induction Motor (1750 RPM nominal, 85°C limit, ISO 10816 4.5 mm/s vibration limit).",
+                "Conveyor: Material Handling Belt Conveyor (450 RPM nominal, 70°C limit, 3.8 mm/s vibration limit).",
+                "Pump: Cooling Circuit Centrifugal Water Pump (2900 RPM nominal, 80°C limit, 5.0 mm/s vibration limit).",
+                "CNC: 5-Axis Precision Milling Machining Center (2400 RPM nominal, 90°C limit, 5.5 mm/s vibration limit).",
                 "Supported Regimes: Normal, High Temp, High Vibration, Overload, Reduced Production, Stoppage, and Sensor Spikes."
             ],
             "notes": "Each machine has distinct physical operating envelopes, thermal thresholds, and baseline vibration signatures corresponding to its specific mechanical design."

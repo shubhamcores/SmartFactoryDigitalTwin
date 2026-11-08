@@ -5,11 +5,17 @@
  */
 
 const MACHINE_COLORS = {
-    "Motor": "#3b82f6",     // Blue
-    "Conveyor": "#10b981",  // Emerald
-    "Pump": "#06b6d4",      // Cyan
-    "CNC": "#f59e0b"        // Amber
+    "Motor_1": "#3b82f6",     // Blue
+    "Conveyor_1": "#10b981",  // Emerald
+    "Pump_1": "#06b6d4",      // Cyan
+    "CNC_1": "#f59e0b",       // Amber
+    "Motor": "#3b82f6",
+    "Conveyor": "#10b981",
+    "Pump": "#06b6d4",
+    "CNC": "#f59e0b"
 };
+
+const MONITORED_MACHINES = ["Motor", "Conveyor", "Pump", "CNC"];
 
 const MAX_HISTORY_POINTS = 20;
 
@@ -19,6 +25,10 @@ let chartTemp, chartVib, chartSpeed, chartProd;
 // Telemetry Time-Series Buffers
 const timeLabels = [];
 const telemetryBuffers = {
+    "Motor_1": { temp: [], vib: [], speed: [], prod: [] },
+    "Conveyor_1": { temp: [], vib: [], speed: [], prod: [] },
+    "Pump_1": { temp: [], vib: [], speed: [], prod: [] },
+    "CNC_1": { temp: [], vib: [], speed: [], prod: [] },
     "Motor": { temp: [], vib: [], speed: [], prod: [] },
     "Conveyor": { temp: [], vib: [], speed: [], prod: [] },
     "Pump": { temp: [], vib: [], speed: [], prod: [] },
@@ -65,7 +75,7 @@ function initCharts() {
     };
 
     const makeDatasets = (metricKey) => {
-        return Object.keys(MACHINE_COLORS).map(mId => ({
+        return MONITORED_MACHINES.map(mId => ({
             label: mId,
             data: telemetryBuffers[mId][metricKey],
             borderColor: MACHINE_COLORS[mId],
@@ -155,7 +165,8 @@ async function fetchDashboardTelemetry() {
         }
 
         telemetryList.forEach(item => {
-            const mId = item.machine_id;
+            const normMap = { "Motor_1": "Motor", "Conveyor_1": "Conveyor", "Pump_1": "Pump", "CNC_1": "CNC" };
+            const mId = normMap[item.machine_id] || item.machine_id;
             lastSource = item.data_source || "SIMULATED";
 
             // Count statuses

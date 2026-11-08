@@ -12,10 +12,10 @@ This document specifies the software requirements for the **FactoryTwin** smart 
 
 ### 1.2 Scope of the System
 The system monitors four critical industrial machinery classes:
-1. `Motor_1`: Primary drive 3-phase induction motor (1750 RPM nominal).
-2. `Conveyor_1`: Material handling belt conveyor system (450 RPM nominal).
-3. `Pump_1`: Cooling circuit centrifugal water pump (2900 RPM nominal).
-4. `CNC_1`: 5-axis precision milling machining center (2400 RPM nominal).
+1. `Motor`: Primary drive 3-phase induction motor (1750 RPM nominal).
+2. `Conveyor`: Material handling belt conveyor system (450 RPM nominal).
+3. `Pump`: Cooling circuit centrifugal water pump (2900 RPM nominal).
+4. `CNC`: 5-axis precision milling machining center (2400 RPM nominal).
 
 The core software operates completely standalone on Windows 10/11 with zero mandatory hardware or internet connection requirements. An optional MQTT module connects to local Mosquitto or cloud brokers (HiveMQ Cloud via TLS 8883), and an optional ESP32 edge node enables physical MEMS vibration acquisition.
 

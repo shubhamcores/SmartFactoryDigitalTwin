@@ -9,7 +9,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from app import create_app
-from database import init_db
+from database import init_db, get_db_connection
 
 class TestAPIAndAuth(unittest.TestCase):
     """Integration test suite for authentication flows, session handling, RBAC enforcement, and REST endpoints."""
@@ -81,34 +81,34 @@ class TestAPIAndAuth(unittest.TestCase):
         """Verify fault injection API accepts valid condition and updates simulator state."""
         self.client.post("/login", data={"username": "operator", "password": "Operator@12345"})
         res = self.client.post("/api/simulator/inject_fault", json={
-            "machine_id": "Motor_1",
+            "machine_id": "Motor",
             "condition": "HIGH_VIB",
             "duration_cycles": 8
         })
         self.assertEqual(res.status_code, 200)
         data = json.loads(res.data)
         self.assertTrue(data["success"])
-        self.assertIn("applied to Motor_1", data["message"])
+        self.assertIn("applied to Motor", data["message"])
 
     def test_datasource_mode_switching_api(self):
         """Verify API allows switching between Synthetic Simulator and ESP32 Edge Node."""
         self.client.post("/login", data={"username": "admin", "password": "Admin@12345"})
 
-        # Switch Motor_1 to ESP32 mode
+        # Switch Motor to ESP32 mode
         res = self.client.post("/api/datasource/set_mode", json={
-            "machine_id": "Motor_1",
+            "machine_id": "Motor",
             "mode": "ESP32"
         })
         self.assertEqual(res.status_code, 200)
         data = json.loads(res.data)
         self.assertTrue(data["success"])
-        self.assertEqual(data["source_modes"]["Motor_1"], "ESP32")
+        self.assertEqual(data["source_modes"]["Motor"], "ESP32")
 
         # Verify via GET /api/datasource/mode
         get_res = self.client.get("/api/datasource/mode")
         self.assertEqual(get_res.status_code, 200)
         get_data = json.loads(get_res.data)
-        self.assertEqual(get_data["source_modes"]["Motor_1"], "ESP32")
+        self.assertEqual(get_data["source_modes"]["Motor"], "ESP32")
 
         # Switch back to SYNTHETIC
         res_back = self.client.post("/api/datasource/set_mode", json={
@@ -119,9 +119,15 @@ class TestAPIAndAuth(unittest.TestCase):
 
     def test_esp32_telemetry_ingestion_api(self):
         """Verify ESP32 hardware endpoint ingests, validates, and tags data_source as ESP32_EDGE."""
+        test_msg_id = "ESP32-UNIT-TEST-999"
+        conn = get_db_connection()
+        conn.execute("DELETE FROM telemetry WHERE message_id = ?", (test_msg_id,))
+        conn.commit()
+        conn.close()
+
         sample_esp32 = {
-            "message_id": "ESP32-UNIT-TEST-999",
-            "machine_id": "Motor_1",
+            "message_id": test_msg_id,
+            "machine_id": "Motor",
             "temperature": 74.2,
             "vibration": 2.85,
             "speed": 1740.0,
@@ -134,7 +140,7 @@ class TestAPIAndAuth(unittest.TestCase):
         data = json.loads(res.data)
         self.assertTrue(data["success"])
         self.assertEqual(data["telemetry"]["data_source"], "ESP32_EDGE")
-        self.assertEqual(data["telemetry"]["machine_id"], "Motor_1")
+        self.assertEqual(data["telemetry"]["machine_id"], "Motor")
 
 if __name__ == "__main__":
     unittest.main()

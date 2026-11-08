@@ -45,10 +45,10 @@
             <label class="form-label small text-secondary fw-semibold mb-1">Machine</label>
             <select name="machine_id" class="form-select form-select-sm form-scada">
                 <option value="ALL">All Machinery</option>
-                <option value="Motor" {% if current_filters.machine_id == 'Motor' %}selected{% endif %}>Motor (Drive)</option>
-                <option value="Conveyor" {% if current_filters.machine_id == 'Conveyor' %}selected{% endif %}>Conveyor (Handling)</option>
-                <option value="Pump" {% if current_filters.machine_id == 'Pump' %}selected{% endif %}>Pump (Coolant)</option>
-                <option value="CNC" {% if current_filters.machine_id == 'CNC' %}selected{% endif %}>CNC (Milling)</option>
+                <option value="Motor" {% if current_filters.machine_id in ('Motor', 'Motor_1') %}selected{% endif %}>Motor (Drive)</option>
+                <option value="Conveyor" {% if current_filters.machine_id in ('Conveyor', 'Conveyor_1') %}selected{% endif %}>Conveyor (Handling)</option>
+                <option value="Pump" {% if current_filters.machine_id in ('Pump', 'Pump_1') %}selected{% endif %}>Pump (Coolant)</option>
+                <option value="CNC" {% if current_filters.machine_id in ('CNC', 'CNC_1') %}selected{% endif %}>CNC (Milling)</option>
             </select>
         </div>
         <div class="col-12 col-sm-6 col-md-3">

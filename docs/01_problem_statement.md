@@ -32,7 +32,7 @@ The FactoryTwin solution is engineered for two primary industrial roles:
 ---
 
 ## 3. Project Objectives
-1. **Digital Twin Simulation Engine**: Create a multi-machine physics-inspired digital twin modeling 4 industrial assets (`Motor_1`, `Conveyor_1`, `Pump_1`, `CNC_1`) with realistic thermal inertia, mechanical dynamics, and reproducible operational regimes.
+1. **Digital Twin Simulation Engine**: Create a multi-machine physics-inspired digital twin modeling 4 industrial assets (`Motor`, `Conveyor`, `Pump`, `CNC`) with realistic thermal inertia, mechanical dynamics, and reproducible operational regimes.
 2. **Industrial Communication Layer**: Implement dual-mode telemetry transport supporting standalone offline zero-dependency simulation and live MQTT telemetry publishing/subscribing over TLS to cloud brokers (HiveMQ Cloud).
 3. **Unsupervised AI Anomaly Detection**: Implement a scikit-learn `IsolationForest` pipeline trained strictly on normal operational distributions to detect multivariate anomalies without requiring expensive labeled failure histories.
 4. **Intelligent Alert Management**: Implement automated threshold evaluation, anomaly scoring, deduplication cooldowns (preventing alarm fatigue), and complete ACK/Resolve lifecycles.

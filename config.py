@@ -11,6 +11,28 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / ".env")
 
+class MachineRegistry(dict):
+    """Dictionary supporting canonical machine IDs (Motor, Conveyor, Pump, CNC) with backward-compatible aliases."""
+    ALIASES = {
+        "Motor_1": "Motor",
+        "Motor": "Motor",
+        "Conveyor_1": "Conveyor",
+        "Conveyor": "Conveyor",
+        "Pump_1": "Pump",
+        "Pump": "Pump",
+        "CNC_1": "CNC",
+        "CNC": "CNC"
+    }
+
+    def __getitem__(self, key):
+        return super().__getitem__(self.ALIASES.get(key, key))
+
+    def __contains__(self, key):
+        return super().__contains__(self.ALIASES.get(key, key))
+
+    def get(self, key, default=None):
+        return super().get(self.ALIASES.get(key, key), default)
+
 class Config:
     """Application configuration parameters and industrial operating limits."""
 
@@ -65,7 +87,7 @@ class Config:
     ALERT_COOLDOWN_SECONDS = int(os.getenv("ALERT_COOLDOWN_SECONDS", 60))
 
     # Supported Industrial Machines & Default Profiles
-    MACHINES = {
+    MACHINES = MachineRegistry({
         "Motor": {
             "name": "Main Drive Induction Motor",
             "type": "Electric Motor",
@@ -122,7 +144,12 @@ class Config:
             "max_load": 95.0,
             "production_rate": 2
         }
-    }
+    })
+
+    @classmethod
+    def normalize_machine_id(cls, machine_id: str) -> str:
+        """Resolve any alias (e.g. 'Motor_1' -> 'Motor')."""
+        return MachineRegistry.ALIASES.get(machine_id, machine_id)
 
     # Anomaly Risk Thresholds (Score normalized 0 - 100)
     RISK_LEVELS = {

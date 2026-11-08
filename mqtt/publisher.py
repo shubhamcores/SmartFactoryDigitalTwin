@@ -104,7 +104,7 @@ if __name__ == "__main__":
     if pub.connect():
         sample_payload = {
             "message_id": f"TEST-{int(time.time())}",
-            "machine_id": "Motor_1",
+            "machine_id": "Motor",
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
             "temperature": 65.4,
             "vibration": 1.75,
@@ -113,8 +113,8 @@ if __name__ == "__main__":
             "status": "RUNNING",
             "production_count": 120
         }
-        success = pub.publish_telemetry("Motor_1", sample_payload)
-        print(f"Published test message to Motor_1: {success}")
+        success = pub.publish_telemetry("Motor", sample_payload)
+        print(f"Published test message to Motor: {success}")
         time.sleep(2)
         pub.disconnect()
     else:

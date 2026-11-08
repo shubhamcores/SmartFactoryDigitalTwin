@@ -32,7 +32,7 @@ A **Digital Twin** is a dynamic, virtual computational mirror of a physical asse
 
 ### 1.3 Project Scope & Deliverables
 The primary deliverables of this BTech individual capstone project comprise:
-1. A multi-asset industrial simulation engine modeling four distinct factory machines (`Motor_1`, `Conveyor_1`, `Pump_1`, `CNC_1`) with seven operational regimes.
+1. A multi-asset industrial simulation engine modeling four distinct factory machines (`Motor`, `Conveyor`, `Pump`, `CNC`) with seven operational regimes.
 2. An unsupervised Isolation Forest anomaly detection pipeline trained strictly on normal operational distributions.
 3. A resilient MQTT telemetry ingestion layer supporting HiveMQ Cloud TLS and message deduplication.
 4. An automated alerting engine with 60-second cooldown deduplication and full lifecycle state tracking (`NEW` $\to$ `ACKNOWLEDGED` $\to$ `RESOLVED`).
@@ -99,10 +99,10 @@ The FactoryTwin application enforces strict modular separation between eight dec
 
 ### 4.1 Physics Simulation Engine
 The simulation engine models 4 assets with characteristic industrial dynamics:
-- `Motor_1`: Baseline 62°C, 1.6 mm/s vibration, 1750 RPM, 65% load.
-- `Conveyor_1`: Baseline 42°C, 1.1 mm/s vibration, 450 RPM, 50% load.
-- `Pump_1`: Baseline 54°C, 2.0 mm/s vibration, 2900 RPM, 70% load.
-- `CNC_1`: Baseline 68°C, 2.3 mm/s vibration, 2400 RPM, 75% load.
+- `Motor`: Baseline 62°C, 1.6 mm/s vibration, 1750 RPM, 65% load.
+- `Conveyor`: Baseline 42°C, 1.1 mm/s vibration, 450 RPM, 50% load.
+- `Pump`: Baseline 54°C, 2.0 mm/s vibration, 2900 RPM, 70% load.
+- `CNC`: Baseline 68°C, 2.3 mm/s vibration, 2400 RPM, 75% load.
 
 To model physical reality, thermodynamic and mechanical state updates utilize exponential smoothing (inertia modeling) rather than instantaneous stepping:
 $$T_t = T_{t-1} + \alpha (T_{\text{target}} - T_{t-1}) + \epsilon_t$$

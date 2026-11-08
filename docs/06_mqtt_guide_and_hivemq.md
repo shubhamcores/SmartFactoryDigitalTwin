@@ -20,14 +20,14 @@ In FactoryTwin, MQTT enables:
 ```
 factory/
 └── machines/
-    ├── Motor_1/
-    │   └── telemetry    <-- Real-time telemetry published by Motor_1 edge node
-    ├── Conveyor_1/
-    │   └── telemetry    <-- Real-time telemetry published by Conveyor_1 edge node
-    ├── Pump_1/
-    │   └── telemetry    <-- Real-time telemetry published by Pump_1 edge node
-    ├── CNC_1/
-    │   └── telemetry    <-- Real-time telemetry published by CNC_1 edge node
+    ├── Motor/
+    │   └── telemetry    <-- Real-time telemetry published by Motor edge node
+    ├── Conveyor/
+    │   └── telemetry    <-- Real-time telemetry published by Conveyor edge node
+    ├── Pump/
+    │   └── telemetry    <-- Real-time telemetry published by Pump edge node
+    ├── CNC/
+    │   └── telemetry    <-- Real-time telemetry published by CNC edge node
     └── alerts           <-- Broadcast emergency safety events
 ```
 
@@ -46,8 +46,8 @@ Every telemetry publish event must conform to the following JSON schema:
 
 ```json
 {
-  "message_id": "MQTT-Motor_1-1730000000",
-  "machine_id": "Motor_1",
+  "message_id": "MQTT-Motor-1730000000",
+  "machine_id": "Motor",
   "timestamp": "2026-11-01 10:15:30",
   "temperature": 64.8,
   "vibration": 1.72,
@@ -124,14 +124,14 @@ MQTT_TOPIC_PREFIX=factory/machines
 To simulate a physical bearing breakdown from outside the application:
 1. In the **Publish** pane, enter the topic:
    ```
-   factory/machines/Motor_1/telemetry
+   factory/machines/Motor/telemetry
    ```
 2. Select **raw** or **json** format.
 3. Paste the following abnormal vibration payload:
    ```json
    {
      "message_id": "EXPLORER-TEST-001",
-     "machine_id": "Motor_1",
+     "machine_id": "Motor",
      "temperature": 72.0,
      "vibration": 9.45,
      "speed": 1720.0,

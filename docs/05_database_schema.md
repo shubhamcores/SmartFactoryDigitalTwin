@@ -147,7 +147,7 @@ Central registry of physical and simulated industrial assets.
 | Column | Data Type | Constraints | Description |
 | :--- | :--- | :--- | :--- |
 | `id` | INTEGER | PRIMARY KEY AUTOINCREMENT | Internal primary key. |
-| `machine_id` | TEXT | UNIQUE, NOT NULL | Industrial identifier (`Motor_1`, `Conveyor_1`, etc.). |
+| `machine_id` | TEXT | UNIQUE, NOT NULL | Industrial identifier (`Motor`, `Conveyor`, etc.). |
 | `name` | TEXT | NOT NULL | Asset descriptive title. |
 | `machine_type` | TEXT | NOT NULL | Equipment classification (e.g., Induction Motor). |
 | `location` | TEXT | NOT NULL | Factory floor bay / plant quadrant. |

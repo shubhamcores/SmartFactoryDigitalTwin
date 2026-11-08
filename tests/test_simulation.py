@@ -16,11 +16,11 @@ class TestSimulation(unittest.TestCase):
 
     def test_machine_state_step_normal(self):
         """Verify normal simulation step produces plausible values within operating bounds."""
-        cfg = Config.MACHINES["Motor_1"]
-        state = MachineState("Motor_1", cfg)
+        cfg = Config.MACHINES["Motor"]
+        state = MachineState("Motor", cfg)
 
         reading = state.step()
-        self.assertEqual(reading["machine_id"], "Motor_1")
+        self.assertEqual(reading["machine_id"], "Motor")
         self.assertEqual(reading["status"], "RUNNING")
         self.assertEqual(reading["data_source"], "SIMULATED")
         # Check values are within physical bounds
@@ -33,8 +33,8 @@ class TestSimulation(unittest.TestCase):
 
     def test_fault_injection_high_temp(self):
         """Verify fault injection for HIGH_TEMP shifts temperature upward and updates status."""
-        cfg = Config.MACHINES["Motor_1"]
-        state = MachineState("Motor_1", cfg)
+        cfg = Config.MACHINES["Motor"]
+        state = MachineState("Motor", cfg)
         state.set_condition("HIGH_TEMP", duration_cycles=5)
 
         for _ in range(3):
@@ -45,8 +45,8 @@ class TestSimulation(unittest.TestCase):
 
     def test_fault_injection_stoppage(self):
         """Verify STOPPAGE fault drives speed to 0 and stops production increment."""
-        cfg = Config.MACHINES["Conveyor_1"]
-        state = MachineState("Conveyor_1", cfg)
+        cfg = Config.MACHINES["Conveyor"]
+        state = MachineState("Conveyor", cfg)
         state.set_condition("STOPPAGE", duration_cycles=3)
 
         reading = state.step()

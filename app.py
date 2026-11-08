@@ -550,7 +550,7 @@ def create_app():
         """Simulate sending a real ESP32 hardware telemetry packet for testing and demonstration."""
         import time
         data = request.get_json(silent=True) or {}
-        machine_id = data.get("machine_id", "Motor_1")
+        machine_id = data.get("machine_id", "Motor")
         temp = float(data.get("temperature", 68.4))
         vib = float(data.get("vibration", 2.15))
         speed = float(data.get("speed", 1745.0))

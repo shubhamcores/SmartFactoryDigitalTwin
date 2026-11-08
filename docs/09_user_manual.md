@@ -78,7 +78,7 @@ After login, you land on the **Central Factory Digital Twin** overview:
 | Monitored Assets | Running Status | Degraded/Warning | Stopped/Trip | Active Alarms | Telemetry Feed |
 |        4         |       4        |        0         |      0       |       0       |   SIMULATED    |
 +----------------------------------------------------------------------------------------------------+
-| [ Motor_1 (Drive) ]   [ Conveyor_1 (Line) ]  [ Pump_1 (Coolant) ]   [ CNC_1 (Milling) ]            |
+| [ Motor (Drive) ]   [ Conveyor (Line) ]  [ Pump (Coolant) ]   [ CNC (Milling) ]            |
 | Temp: 62.4 °C         Temp: 42.1 °C          Temp: 54.3 °C          Temp: 68.2 °C                  |
 | Vib:  1.61 mm/s       Vib:  1.12 mm/s        Vib:  2.01 mm/s        Vib:  2.34 mm/s                |
 | Speed: 1748 RPM       Speed: 452 RPM         Speed: 2904 RPM        Speed: 2402 RPM                |
@@ -106,11 +106,11 @@ FactoryTwin provides an interactive runtime toggle allowing operators to choose 
 1. Click the **Source: SYNTHETIC** button on the top navigation bar (or click the **Feed Source** card on the dashboard).
 2. The **Telemetry Data Source Configuration** modal opens:
    - **Synthetic Physics Simulator**: Autonomous digital twin simulation engine running in the background. Zero physical hardware needed.
-   - **ESP32 Hardware Edge Node**: Pauses synthetic generation for selected asset(s) (e.g. `Motor_1`) and strictly awaits real physical telemetry from an ESP32 microcontroller!
+   - **ESP32 Hardware Edge Node**: Pauses synthetic generation for selected asset(s) (e.g. `Motor`) and strictly awaits real physical telemetry from an ESP32 microcontroller!
 3. **Asset Scope**:
-   - You can toggle all machines globally, or set an individual machine (e.g., `Motor_1`) to ESP32 mode while `Conveyor_1`, `Pump_1`, and `CNC_1` continue on simulation.
+   - You can toggle all machines globally, or set an individual machine (e.g., `Motor`) to ESP32 mode while `Conveyor`, `Pump`, and `CNC` continue on simulation.
 4. **Ingestion Channels for ESP32**:
-   - **MQTT Topic**: `factory/machines/Motor_1/telemetry` (via HiveMQ Cloud or Mosquitto)
+   - **MQTT Topic**: `factory/machines/Motor/telemetry` (via HiveMQ Cloud or Mosquitto)
    - **Direct HTTP REST Endpoint**: `http://<server-ip>:5000/api/esp32/telemetry` (POST JSON)
 5. **One-Click Testing**: Inside the modal, click **"Send Test ESP32 Packet"** to instantly test and demonstrate ESP32 hardware ingestion without physical hardware attached.
 
@@ -132,7 +132,7 @@ To demonstrate how the platform detects and responds to physical machine failure
 
 1. Click the **Fault Simulator** button on the top navigation bar.
 2. The modal dialog appears:
-   - **Target Machine**: Select e.g. `Motor_1`.
+   - **Target Machine**: Select e.g. `Motor`.
    - **Operational Regime**: Choose one of:
      - `HIGH_TEMP`: Simulates cooling failure / thermal runaway.
      - `HIGH_VIB`: Simulates severe bearing raceway spalling.

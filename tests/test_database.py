@@ -55,7 +55,7 @@ class TestDatabase(unittest.TestCase):
         machines = [r["machine_id"] for r in cursor.fetchall()]
         conn.close()
 
-        for m_id in ["Motor_1", "Conveyor_1", "Pump_1", "CNC_1"]:
+        for m_id in ["Motor", "Conveyor", "Pump", "CNC"]:
             self.assertIn(m_id, machines)
 
     def test_telemetry_insert_and_deduplication(self):
@@ -72,7 +72,7 @@ class TestDatabase(unittest.TestCase):
         cursor.execute("""
             INSERT INTO telemetry (
                 message_id, machine_id, timestamp, temperature, vibration, speed, load, status, production_count, data_source
-            ) VALUES (?, 'Motor_1', '2026-11-01 10:00:00', 65.0, 1.8, 1750.0, 60.0, 'RUNNING', 10, 'SIMULATED')
+            ) VALUES (?, 'Motor', '2026-11-01 10:00:00', 65.0, 1.8, 1750.0, 60.0, 'RUNNING', 10, 'SIMULATED')
         """, (test_msg_id,))
         conn.commit()
 
@@ -81,7 +81,7 @@ class TestDatabase(unittest.TestCase):
             cursor.execute("""
                 INSERT INTO telemetry (
                     message_id, machine_id, timestamp, temperature, vibration, speed, load, status, production_count, data_source
-                ) VALUES (?, 'Motor_1', '2026-11-01 10:00:00', 65.0, 1.8, 1750.0, 60.0, 'RUNNING', 10, 'SIMULATED')
+                ) VALUES (?, 'Motor', '2026-11-01 10:00:00', 65.0, 1.8, 1750.0, 60.0, 'RUNNING', 10, 'SIMULATED')
             """, (test_msg_id,))
             conn.commit()
 

@@ -17,10 +17,10 @@ The system employs a layered decoupled architecture where data flows unidirectio
    [PHYSICAL LAYER] (Optional)                  [SIMULATION LAYER] (Core Standalone)
    +-------------------------+                  +-----------------------------------+
    | ESP32 DevKit V1         |                  | Machine Simulator Thread          |
-   | - MPU-6050 IMU          |                  | - Motor_1 (Induction Motor)       |
-   | - DS18B20 Temp Probe    |                  | - Conveyor_1 (Belt Conveyor)      |
-   | - Edge Threshold Alert  |                  | - Pump_1 (Centrifugal Pump)       |
-   +------------+------------+                  | - CNC_1 (5-Axis Milling Machine)  |
+   | - MPU-6050 IMU          |                  | - Motor (Induction Motor)       |
+   | - DS18B20 Temp Probe    |                  | - Conveyor (Belt Conveyor)      |
+   | - Edge Threshold Alert  |                  | - Pump (Centrifugal Pump)       |
+   +------------+------------+                  | - CNC (5-Axis Milling Machine)  |
                 |                               +-----------------+-----------------+
                 | (JSON / MQTT)                                   |
                 v                                                 | (Direct Python Ingestion)
@@ -78,7 +78,7 @@ The system employs a layered decoupled architecture where data flows unidirectio
 ```mermaid
 graph TD
     subgraph Data Sources
-        SIM["Machine Simulation Engine<br/>(Motor_1, Conveyor_1, Pump_1, CNC_1)"]
+        SIM["Machine Simulation Engine<br/>(Motor, Conveyor, Pump, CNC)"]
         ESP["Optional ESP32 Edge Node<br/>(MPU-6050 + WiFi)"]
     end
 

@@ -52,10 +52,10 @@
 ## Slide 5: Monitored Industrial Machinery Assets
 - **Title**: Monitored Factory Assets & Operating Regimes
 - **Key Points**:
-  - `Motor_1`: Primary Drive 3-Phase Induction Motor (1750 RPM nominal, 85°C limit).
-  - `Conveyor_1`: Material Handling Belt Conveyor (450 RPM nominal, 70°C limit).
-  - `Pump_1`: Cooling Circuit Centrifugal Water Pump (2900 RPM nominal, 80°C limit).
-  - `CNC_1`: 5-Axis Precision Milling Machining Center (2400 RPM nominal, 90°C limit).
+  - `Motor`: Primary Drive 3-Phase Induction Motor (1750 RPM nominal, 85°C limit).
+  - `Conveyor`: Material Handling Belt Conveyor (450 RPM nominal, 70°C limit).
+  - `Pump`: Cooling Circuit Centrifugal Water Pump (2900 RPM nominal, 80°C limit).
+  - `CNC`: 5-Axis Precision Milling Machining Center (2400 RPM nominal, 90°C limit).
   - 7 Simulated Regimes: Normal, High Temp, High Vibration, Overload, Reduced Production, Stoppage, and Sensor Spikes.
 - **Speaker Note**: Each machine has distinct physical operating envelopes, thermal thresholds, and baseline vibration signatures corresponding to its specific mechanical design.
 

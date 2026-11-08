@@ -29,7 +29,7 @@ class TestAlerts(unittest.TestCase):
     def test_temperature_threshold_alert_generation(self):
         """Verify high temperature triggers an EXCESSIVE_TEMPERATURE alert."""
         reading = {
-            "machine_id": "Motor_1",
+            "machine_id": "Motor",
             "temperature": 96.0,  # Max threshold is 85.0
             "vibration": 1.6,
             "speed": 1750.0,
@@ -41,14 +41,14 @@ class TestAlerts(unittest.TestCase):
         alerts = evaluate_telemetry_for_alerts(reading)
         self.assertGreaterEqual(len(alerts), 1)
         alert = alerts[0]
-        self.assertEqual(alert["machine_id"], "Motor_1")
+        self.assertEqual(alert["machine_id"], "Motor")
         self.assertEqual(alert["alert_type"], "EXCESSIVE_TEMPERATURE")
         self.assertEqual(alert["status"], "NEW")
 
     def test_alert_cooldown_deduplication(self):
         """Verify repeated violations during cooldown window do not flood the database."""
         reading = {
-            "machine_id": "Motor_1",
+            "machine_id": "Motor",
             "temperature": 98.0,
             "vibration": 1.6,
             "speed": 1750.0,
@@ -68,7 +68,7 @@ class TestAlerts(unittest.TestCase):
     def test_alert_acknowledgement_and_resolution_lifecycle(self):
         """Verify alert progresses from NEW -> ACKNOWLEDGED -> RESOLVED."""
         reading = {
-            "machine_id": "Pump_1",
+            "machine_id": "Pump",
             "temperature": 54.0,
             "vibration": 8.0,  # Breaches 5.0
             "speed": 2900.0,

@@ -13,17 +13,20 @@ from config import Config
 logger = logging.getLogger(__name__)
 
 def get_db_connection():
-    """Establish and return a connection to the SQLite database with row factory."""
+    """Establish and return a connection to the SQLite database."""
     Config.ensure_directories()
+
     conn = sqlite3.connect(
         Config.DATABASE_PATH,
         timeout=20.0,
         detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
     )
+
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON;")
-    conn.execute("PRAGMA journal_mode = WAL;")  # High concurrency for simulator + web
+
     return conn
+
 
 def init_db(force_recreate=False):
     """
@@ -32,6 +35,7 @@ def init_db(force_recreate=False):
     """
     Config.ensure_directories()
     conn = get_db_connection()
+    conn.execute("PRAGMA journal_mode = WAL;")
     cursor = conn.cursor()
 
     try:
@@ -190,7 +194,9 @@ def init_db(force_recreate=False):
 
             -- High-Performance Indexes for Query Optimization
             CREATE INDEX IF NOT EXISTS idx_telemetry_machine_time ON telemetry(machine_id, timestamp DESC);
+            CREATE INDEX IF NOT EXISTS idx_telemetry_machine_id_id ON telemetry(machine_id, id DESC);
             CREATE INDEX IF NOT EXISTS idx_telemetry_msg_id ON telemetry(message_id);
+            CREATE INDEX IF NOT EXISTS idx_anomaly_telemetry_id ON anomaly_predictions(telemetry_id);
             CREATE INDEX IF NOT EXISTS idx_alerts_machine_status ON alerts(machine_id, status);
             CREATE INDEX IF NOT EXISTS idx_alerts_timestamp ON alerts(timestamp DESC);
             CREATE INDEX IF NOT EXISTS idx_anomaly_machine_time ON anomaly_predictions(machine_id, timestamp DESC);

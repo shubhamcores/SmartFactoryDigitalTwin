@@ -19,16 +19,16 @@ class TestAIModel(unittest.TestCase):
 
     def test_detector_inference_normal_reading(self):
         """Verify normal telemetry produces low anomaly score and LOW risk category."""
-        cfg = Config.MACHINES["Motor_1"]
+        cfg = Config.MACHINES["Motor"]
         pred = self.detector.predict(
-            machine_id="Motor_1",
+            machine_id="Motor",
             temperature=cfg["base_temp"],
             vibration=cfg["base_vibration"],
             speed=cfg["base_rpm"],
             load=cfg["base_load"]
         )
 
-        self.assertEqual(pred["machine_id"], "Motor_1")
+        self.assertEqual(pred["machine_id"], "Motor")
         self.assertIn(pred["risk_category"], ["LOW", "MEDIUM"])
         self.assertLess(pred["anomaly_score"], 65.0)
         self.assertIn("operating within", pred["suggested_action"].lower())
@@ -36,7 +36,7 @@ class TestAIModel(unittest.TestCase):
     def test_detector_inference_severe_overheat(self):
         """Verify severe high temperature triggers anomaly and maintenance action."""
         pred = self.detector.predict(
-            machine_id="Motor_1",
+            machine_id="Motor",
             temperature=110.0,  # Max threshold is 85.0
             vibration=1.8,
             speed=1750.0,
@@ -51,7 +51,7 @@ class TestAIModel(unittest.TestCase):
     def test_detector_inference_severe_vibration(self):
         """Verify high vibration triggers bearing analysis guidance."""
         pred = self.detector.predict(
-            machine_id="Pump_1",
+            machine_id="Pump",
             temperature=54.0,
             vibration=9.5,  # Max threshold is 5.0
             speed=2900.0,
@@ -69,7 +69,7 @@ class TestAIModel(unittest.TestCase):
         self.assertIsNone(mock_detector.model)
 
         pred = mock_detector.predict(
-            machine_id="Conveyor_1",
+            machine_id="Conveyor",
             temperature=45.0,
             vibration=1.2,
             speed=450.0,

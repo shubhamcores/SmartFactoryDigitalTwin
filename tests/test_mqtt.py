@@ -17,7 +17,7 @@ class TestMQTT(unittest.TestCase):
         """Verify compliant JSON telemetry string passes validation."""
         valid_json = json.dumps({
             "message_id": "TEST-MQTT-001",
-            "machine_id": "Motor_1",
+            "machine_id": "Motor",
             "temperature": 68.5,
             "vibration": 1.75,
             "speed": 1740.0,
@@ -28,13 +28,13 @@ class TestMQTT(unittest.TestCase):
 
         is_valid, parsed, err = validate_telemetry_payload(valid_json)
         self.assertTrue(is_valid)
-        self.assertEqual(parsed["machine_id"], "Motor_1")
+        self.assertEqual(parsed["machine_id"], "Motor")
         self.assertEqual(parsed["data_source"], "MQTT_LIVE")
         self.assertEqual(err, "")
 
     def test_malformed_json_syntax(self):
         """Verify broken JSON syntax is rejected cleanly without raising an unhandled exception."""
-        broken_json = '{"machine_id": "Motor_1", "temperature": 65.0'  # Missing closing brace
+        broken_json = '{"machine_id": "Motor", "temperature": 65.0'  # Missing closing brace
         is_valid, parsed, err = validate_telemetry_payload(broken_json)
         self.assertFalse(is_valid)
         self.assertIn("Invalid JSON", err)
@@ -42,7 +42,7 @@ class TestMQTT(unittest.TestCase):
     def test_missing_required_fields(self):
         """Verify omission of mandatory sensor fields causes validation rejection."""
         incomplete_json = json.dumps({
-            "machine_id": "Motor_1",
+            "machine_id": "Motor",
             "temperature": 68.0
             # vibration, speed, load missing
         })
@@ -53,7 +53,7 @@ class TestMQTT(unittest.TestCase):
     def test_out_of_bounds_sensor_readings(self):
         """Verify physical plausibility bounds reject corrupt sensor numbers."""
         insane_temp_json = json.dumps({
-            "machine_id": "Motor_1",
+            "machine_id": "Motor",
             "temperature": 999.0,  # Physically impossible for factory floor
             "vibration": 1.5,
             "speed": 1750.0,

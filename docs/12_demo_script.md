@@ -45,7 +45,7 @@ Before inviting the project examiners or evaluating committee to view the demons
    - Show the **Telemetry Feed Badge**: Displays `SIMULATED` (or `MQTT_LIVE` if broker connected).
    - Point to the **Last Sync timestamp**: Updates every 3 seconds asynchronously via fetch API without full-page flickering.
 2. **Show the 4 Machines**:
-   - `Motor_1` (Induction Motor), `Conveyor_1` (Belt Conveyor), `Pump_1` (Coolant Pump), `CNC_1` (5-Axis Mill).
+   - `Motor` (Induction Motor), `Conveyor` (Belt Conveyor), `Pump` (Coolant Pump), `CNC` (5-Axis Mill).
    - Show that each card displays live Temperature (°C), Vibration (mm/s), Speed (RPM), Load (%), and Units.
    - Point to the **AI Anomaly Risk Bar**: Green bar showing `LOW` risk (~12/100 score) computed by the Isolation Forest model.
 3. **Inspect the Real-Time Charts**:
@@ -61,12 +61,12 @@ Before inviting the project examiners or evaluating committee to view the demons
 1. **Open Fault Simulator Panel**:
    - Click the yellow **Fault Simulator** button on the top navbar.
    - Select:
-     - **Target Machine**: `Motor_1`
+     - **Target Machine**: `Motor`
      - **Regime**: `HIGH_TEMP` (Coolant Failure / Overheating)
      - **Duration**: `10` cycles.
    - Click **Apply Injected Regime**.
 2. **Observe Real-Time System Reaction**:
-   - Within 3 seconds, `Motor_1`'s card temperature begins rising from 62°C toward 95°C.
+   - Within 3 seconds, `Motor`'s card temperature begins rising from 62°C toward 95°C.
    - The status badge transitions from `RUNNING` to `WARNING`.
    - **Watch the AI Risk Bar**: It surges from `LOW` (12) to `HIGH` (75+).
    - The top alarm counter increments: **Active Alarms: 1**.
@@ -74,7 +74,7 @@ Before inviting the project examiners or evaluating committee to view the demons
      - Severity: `CRITICAL`
      - Message: *"Critical thermal threshold breached: 96.2°C (Limit: 85.0°C). Thermal runaway risk."*
 3. **Drill Down into the Digital Twin Inspector**:
-   - Click **Twin Inspector** on the `Motor_1` card (navigates to `/machine/Motor_1`).
+   - Click **Twin Inspector** on the `Motor` card (navigates to `/machine/Motor`).
    - Show the large real-time gauge metrics.
    - Point to the **AI Diagnostics Box**:
      - Calculated Risk Score: `82.4 / 100` (CRITICAL RISK).
@@ -103,7 +103,7 @@ Before inviting the project examiners or evaluating committee to view the demons
 ### Part 5: Operational Reporting & Compliance Export (7:30 – 9:00)
 1. **Navigate to Reports & Audits (`/reports`)**:
    - Select Report Category: `1. Machine Telemetry Stream`.
-   - Machine: `Motor_1`.
+   - Machine: `Motor`.
    - Click **Preview Query Results** to inspect records in the browser table.
 2. **Download CSV Export**:
    - Click **Download CSV (Excel)**.
@@ -128,7 +128,7 @@ Before inviting the project examiners or evaluating committee to view the demons
    - Point out that every action performed during this demonstration was recorded:
      - `LOGIN_SUCCESS` (operator & admin)
      - `UNAUTHORIZED_ACCESS_ATTEMPT` (when operator tried to access admin route)
-     - `FAULT_INJECTED` (Motor_1 HIGH_TEMP)
+     - `FAULT_INJECTED` (Motor HIGH_TEMP)
      - `ALERT_ACKNOWLEDGED`
      - `ALERT_RESOLVED` (with notes)
 

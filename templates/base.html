@@ -46,16 +46,16 @@
             <small class="text-uppercase fw-semibold text-secondary" style="font-size: 0.65rem; letter-spacing: 0.08em;">Digital Twin Assets</small>
         </div>
         <nav class="nav flex-column mb-3">
-            <a class="nav-link {% if request.view_args and request.view_args.get('machine_id') == 'Motor' %}active{% endif %}" href="{{ url_for('dashboard.machine_detail', machine_id='Motor') }}">
+            <a class="nav-link {% if request.view_args and request.view_args.get('machine_id') in ('Motor', 'Motor_1') %}active{% endif %}" href="{{ url_for('dashboard.machine_detail', machine_id='Motor') }}">
                 <i class="bi bi-gear-wide-connected text-primary"></i> Motor (Drive)
             </a>
-            <a class="nav-link {% if request.view_args and request.view_args.get('machine_id') == 'Conveyor' %}active{% endif %}" href="{{ url_for('dashboard.machine_detail', machine_id='Conveyor') }}">
+            <a class="nav-link {% if request.view_args and request.view_args.get('machine_id') in ('Conveyor', 'Conveyor_1') %}active{% endif %}" href="{{ url_for('dashboard.machine_detail', machine_id='Conveyor') }}">
                 <i class="bi bi-arrows-expand text-success"></i> Conveyor (Handling)
             </a>
-            <a class="nav-link {% if request.view_args and request.view_args.get('machine_id') == 'Pump' %}active{% endif %}" href="{{ url_for('dashboard.machine_detail', machine_id='Pump') }}">
+            <a class="nav-link {% if request.view_args and request.view_args.get('machine_id') in ('Pump', 'Pump_1') %}active{% endif %}" href="{{ url_for('dashboard.machine_detail', machine_id='Pump') }}">
                 <i class="bi bi-droplet-fill text-info"></i> Pump (Coolant)
             </a>
-            <a class="nav-link {% if request.view_args and request.view_args.get('machine_id') == 'CNC' %}active{% endif %}" href="{{ url_for('dashboard.machine_detail', machine_id='CNC') }}">
+            <a class="nav-link {% if request.view_args and request.view_args.get('machine_id') in ('CNC', 'CNC_1') %}active{% endif %}" href="{{ url_for('dashboard.machine_detail', machine_id='CNC') }}">
                 <i class="bi bi-tools text-warning"></i> CNC (Milling)
             </a>
         </nav>
@@ -206,7 +206,7 @@
                             <select id="fault-machine-id" class="form-select form-scada">
                                 <option value="Motor">Motor (Main Induction Drive)</option>
                                 <option value="Conveyor">Conveyor (Belt Conveyor)</option>
-                                <option value="Pump">Pump  (Cooling Pump)</option>
+                                <option value="Pump">Pump (Cooling Pump)</option>
                                 <option value="CNC">CNC (Precision Milling Center)</option>
                             </select>
                         </div>

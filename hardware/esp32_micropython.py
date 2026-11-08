@@ -18,8 +18,8 @@ MQTT_BROKER = "your-cluster-url.s1.eu.hivemq.cloud"
 MQTT_PORT = 8883
 MQTT_USER = "hivemq_device_user"
 MQTT_PASS = "hivemq_device_pass"
-CLIENT_ID = "ESP32_MicroPython_Motor1"
-PUB_TOPIC = b"factory/machines/Motor_1/telemetry"
+CLIENT_ID = "ESP32_MicroPython_Motor"
+PUB_TOPIC = b"factory/machines/Motor/telemetry"
 
 # Pin Configuration
 I2C_SDA_PIN = 21
@@ -77,7 +77,7 @@ def main():
 
             payload = {
                 "message_id": f"ESP32-UPY-{time.time()}",
-                "machine_id": "Motor_1",
+                "machine_id": "Motor",
                 "temperature": temp,
                 "vibration": vib,
                 "speed": speed,
