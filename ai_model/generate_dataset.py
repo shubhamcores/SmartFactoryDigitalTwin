@@ -1,5 +1,5 @@
 """
-Synthetic Dataset Generator for Industrial Machine Telemetry (P_307)
+Synthetic Dataset Generator for Industrial Machine Telemetry 
 Generates:
 1. Normal operating telemetry (Unsupervised Training Set - no labels, strictly normal behavior)
 2. Evaluation telemetry (Test Set containing controlled synthetic anomalies with ground truth labels)
@@ -79,7 +79,7 @@ def generate_datasets(n_train_per_machine=3000, n_eval_per_machine=750, random_s
     rng = np.random.default_rng(random_seed)
 
     print("=" * 70)
-    print("FactoryTwin (P_307) - Synthetic Industrial Telemetry Generation")
+    print("FactoryTwin  - Synthetic Industrial Telemetry Generation")
     print("=" * 70)
 
     # 1. Generate Normal Training Dataset (Unsupervised)

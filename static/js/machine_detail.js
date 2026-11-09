@@ -1,5 +1,5 @@
 /**
- * FactoryTwin (P_307) - Individual Machine Digital Twin Inspector
+ * FactoryTwin  - Individual Machine Digital Twin Inspector
  * High-resolution multi-sensor tracking, anomaly risk profiling, and maintenance log feed.
  */
 
@@ -102,10 +102,71 @@ function initDetailChart() {
         }
     });
 }
+function clearMachineDetailDisplay() {
+    setText("dt-temp", "--");
+    setText("dt-vib", "--");
+    setText("dt-rpm", "--");
+    setText("dt-load", "--");
+    setText("dt-ai-score", "--");
+    setText("dt-ai-method", "WAITING FOR TELEMETRY");
+
+    const status = document.getElementById("detail-machine-status");
+    if (status) {
+        status.textContent = "WAITING FOR ESP32";
+        status.className = "badge-scada";
+    }
+
+    const category = document.getElementById("dt-ai-category");
+    if (category) {
+        category.textContent = "NO DATA";
+        category.className = "badge bg-secondary px-3 py-1";
+    }
+
+    const action = document.getElementById("dt-ai-action");
+    if (action) {
+        action.textContent = "Waiting for live ESP32 telemetry.";
+    }
+
+    const bar = document.getElementById("dt-ai-bar");
+    if (bar) {
+        bar.style.width = "0%";
+    }
+
+    historyLabels.length = 0;
+    seriesTemp.length = 0;
+    seriesVib.length = 0;
+    seriesSpeed.length = 0;
+    seriesLoad.length = 0;
+
+    if (detailChart) detailChart.update("none");
+}
 
 async function loadMachineHistory() {
     try {
-        const res = await fetch(`/api/telemetry/history/${CURRENT_MACHINE_ID}?limit=20`);
+        const latestRes = await fetch("/api/telemetry/latest");
+        if (!latestRes.ok) return;
+
+        const latestData = await latestRes.json();
+        const mode = latestData.source_modes?.[CURRENT_MACHINE_ID];
+
+        if (mode === "ESP32") {
+            const current = (latestData.telemetry || []).find(
+                item => item.machine_id === CURRENT_MACHINE_ID
+            );
+
+            if (current) {
+                updateLiveCards(current);
+            } else {
+                clearMachineDetailDisplay();
+            }
+
+            return;
+        }
+
+        const res = await fetch(
+            `/api/telemetry/history/${CURRENT_MACHINE_ID}?limit=20`
+        );
+
         if (!res.ok) return;
 
         const data = await res.json();
@@ -118,8 +179,9 @@ async function loadMachineHistory() {
         seriesLoad.length = 0;
 
         records.forEach(r => {
-            const timeStr = r.timestamp ? r.timestamp.split(" ")[1] : "";
-            historyLabels.push(timeStr);
+            historyLabels.push(
+                r.timestamp ? r.timestamp.split(" ")[1] : ""
+            );
             seriesTemp.push(r.temperature);
             seriesVib.push(r.vibration);
             seriesSpeed.push(r.speed);
@@ -127,9 +189,13 @@ async function loadMachineHistory() {
         });
 
         if (detailChart) detailChart.update();
+
         if (records.length > 0) {
             updateLiveCards(records[records.length - 1]);
+        } else {
+            clearMachineDetailDisplay();
         }
+
     } catch (e) {
         console.error("Failed to fetch machine history:", e);
     }
@@ -142,12 +208,23 @@ async function pollLiveMachineTelemetry() {
 
         const data = await res.json();
         const list = data.telemetry || [];
-        const current = list.find(item => item.machine_id === CURRENT_MACHINE_ID);
+
+        const mode = data.source_modes?.[CURRENT_MACHINE_ID];
+        const current = list.find(
+            item => item.machine_id === CURRENT_MACHINE_ID
+        );
+
+        if (mode === "ESP32" && !current) {
+            clearMachineDetailDisplay();
+            fetchRecentMachineAnomalies();
+            return;
+        }
 
         if (current) {
             updateLiveCards(current);
 
             const timeStr = new Date().toLocaleTimeString();
+
             historyLabels.push(timeStr);
             seriesTemp.push(current.temperature);
             seriesVib.push(current.vibration);
@@ -163,10 +240,12 @@ async function pollLiveMachineTelemetry() {
             }
 
             if (detailChart) detailChart.update("none");
+        } else if (mode === "ESP32") {
+            clearMachineDetailDisplay();
         }
 
-        // Refresh recent anomalies list
         fetchRecentMachineAnomalies();
+
     } catch (e) {
         console.error("Error polling machine detail:", e);
     }

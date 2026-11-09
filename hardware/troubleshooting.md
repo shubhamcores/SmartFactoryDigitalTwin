@@ -1,4 +1,4 @@
-# Hardware Troubleshooting & Setup Diagnostics (P_307)
+# Hardware Troubleshooting & Setup Diagnostics 
 
 ## 1. Common Hardware Assembly Issues & Solutions
 

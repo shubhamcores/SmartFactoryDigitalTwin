@@ -1,5 +1,5 @@
 """
-Isolation Forest Model Training and Evaluation (P_307)
+Isolation Forest Model Training and Evaluation 
 Trains an unsupervised Isolation Forest on normal industrial telemetry.
 Evaluates detection performance on a separate labeled synthetic evaluation set.
 Saves model, scaler, and formal metrics report.
@@ -37,7 +37,7 @@ def train_and_evaluate(force_regenerate_data=False):
         generate_datasets()
 
     print("=" * 75)
-    print("FactoryTwin (P_307) - Isolation Forest Training & Rigorous Evaluation")
+    print("FactoryTwin  - Isolation Forest Training & Rigorous Evaluation")
     print("=" * 75)
 
     # 1. Load Data

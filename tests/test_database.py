@@ -1,5 +1,5 @@
 """
-Unit Tests for Database Initialization and Schema Integrity (P_307)
+Unit Tests for Database Initialization and Schema Integrity 
 """
 
 import unittest

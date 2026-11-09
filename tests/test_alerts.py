@@ -1,5 +1,5 @@
 """
-Unit Tests for Alerting Rules, Deduplication, and Lifecycle (P_307)
+Unit Tests for Alerting Rules, Deduplication, and Lifecycle 
 """
 
 import unittest

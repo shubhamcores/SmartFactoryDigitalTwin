@@ -1,4 +1,4 @@
-# Stage 5: Database Schema & Entity-Relationship Model (P_307)
+# Stage 5: Database Schema & Entity-Relationship Model 
 ## Relational Data Architecture and Indexing Strategy
 **Database Engine**: SQLite 3 (WAL Mode Enabled)  
 **File Location**: `factory_twin.db` (auto-created in project root)

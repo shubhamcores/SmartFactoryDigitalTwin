@@ -1,5 +1,5 @@
 """
-Authentication and Authorization Service for FactoryTwin (P_307)
+Authentication and Authorization Service for FactoryTwin 
 Enforces Role-Based Access Control (RBAC), session management, password hashing,
 and route protection decorators for Administrators and Operators.
 """

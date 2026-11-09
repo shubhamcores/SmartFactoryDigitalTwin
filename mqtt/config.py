@@ -1,5 +1,5 @@
 """
-MQTT Configuration and Payload Validation (P_307)
+MQTT Configuration and Payload Validation 
 Provides settings for local MQTT and HiveMQ Cloud (TLS 8883) brokers,
 and enforces payload schema and range validation.
 """

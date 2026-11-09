@@ -1,4 +1,4 @@
-# Stage 2: Milestone-Based Project Planning (P_307)
+# Stage 2: Milestone-Based Project Planning 
 ## 20–30 Day Individual Engineering Plan
 **Development Methodology**: HCLTech Embedded Systems & IoT Project Creation Framework
 
@@ -34,7 +34,7 @@ The project lifecycle is structured into four sequential phases spanning a typic
 |   [M3.1] Alert Cooldown Deduplication & Lifecycle Engine                                |
 |   [M3.2] ReportLab Executive PDF & CSV Reporting Services                               |
 |   [M3.3] Optional ESP32 Firmware & Hardware Prototyping Docs                            |
-|   [M3.4] End-to-End Automated Test Suite Verification (30 Tests)                        |
+|   [M3.4] End-to-End Automated Test Suite Verification (32 Tests)                        |
 +-----------------------------------------------------------------------------------------+
 | Phase 4: PRESENTATION (Days 23 - 25)                                                    |
 |   [M4.1] HCLTech Project Report & Technical Documentation                               |

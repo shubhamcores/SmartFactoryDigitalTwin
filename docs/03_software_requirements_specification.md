@@ -1,4 +1,4 @@
-# Stage 3: Software Requirements Specification (SRS) (P_307)
+# Stage 3: Software Requirements Specification (SRS) 
 ## AI-Driven Digital Twin for Smart Factory Operations
 **Standard**: IEEE 830-1998 Recommended Practice for SRS  
 **Project Code**: P_307 | Version 1.0.0

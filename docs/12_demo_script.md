@@ -1,4 +1,4 @@
-# Stage 12: Live Demonstration Script & Evaluation Guide (P_307)
+# Stage 12: Live Demonstration Script & Evaluation Guide 
 ## Step-by-Step Live Demonstration Protocol for Project Defense & Vivas
 **Duration**: 8 to 12 Minutes  
 **Demonstration Target**: Web Browser at `http://127.0.0.1:5000`
@@ -9,7 +9,7 @@
 Before inviting the project examiners or evaluating committee to view the demonstration, ensure:
 1. Terminal 1 is running:
    ```powershell
-   cd g:\DigitalTwinForFactory
+   cd g:\SmartFactoryDigitalTwin
    python app.py
    ```
 2. Browser is open at `http://127.0.0.1:5000/login`.
@@ -17,7 +17,7 @@ Before inviting the project examiners or evaluating committee to view the demons
    ```powershell
    python tests/run_tests.py
    ```
-   *(Ensure 30/30 tests passed).*
+   *(Ensure 32/32 tests passed).*
 
 ---
 

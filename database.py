@@ -1,5 +1,5 @@
 """
-Database Layer for FactoryTwin (P_307)
+Database Layer for FactoryTwin 
 Handles SQLite database connection, initialization, schema migration, and transaction management.
 """
 

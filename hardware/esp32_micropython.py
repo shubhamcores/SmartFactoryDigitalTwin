@@ -1,5 +1,5 @@
 """
-FactoryTwin (P_307) - ESP32 MicroPython Industrial Edge Telemetry
+FactoryTwin  - ESP32 MicroPython Industrial Edge Telemetry
 Alternative firmware implementation for MicroPython runtime on ESP32 DevKit.
 """
 

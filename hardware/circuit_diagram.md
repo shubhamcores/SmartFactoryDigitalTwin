@@ -1,4 +1,4 @@
-# Hardware Circuit Diagram & Wiring Specification (P_307)
+# Hardware Circuit Diagram & Wiring Specification 
 
 ## 1. Overview
 This hardware extension provides edge telemetry acquisition using an **ESP32 DevKit V1** microcontroller connected to an **MPU-6050 6-Axis IMU** accelerometer/gyroscope module.

@@ -1,5 +1,5 @@
 """
-ESP32 Hardware Ingestion Service for FactoryTwin (P_307)
+ESP32 Hardware Ingestion Service for FactoryTwin 
 Processes live telemetry arriving directly from physical or simulated ESP32 edge nodes
 (Supports HTTP REST POST and MQTT transports).
 Performs schema validation, range checks, deduplication, Isolation Forest inference,
@@ -8,7 +8,7 @@ threshold evaluation, and database persistence with data_source = 'ESP32_EDGE'.
 
 import time
 import logging
-from datetime import datetime
+from datetime import datetime,timezone
 from database import get_db_connection
 from config import Config
 from ai_model.predict import get_anomaly_detector
@@ -16,7 +16,7 @@ from services.alert_service import evaluate_telemetry_for_alerts
 
 logger = logging.getLogger(__name__)
 
-def ingest_esp32_telemetry(payload: dict) -> tuple[bool, dict, str]:
+def ingest_esp32_telemetry(payload: dict,data_source: str = "ESP32_EDGE") -> tuple[bool, dict, str]:
     """
     Ingest, validate, infer anomalies, and persist an ESP32 telemetry packet.
     Returns: (success: bool, result_dict: dict, error_message: str)
@@ -50,7 +50,7 @@ def ingest_esp32_telemetry(payload: dict) -> tuple[bool, dict, str]:
     if not (0.0 <= vib <= 100.0):
         return False, {}, f"Vibration {vib} mm/s outside plausible range (0 to 100 mm/s)"
 
-    timestamp = payload.get("timestamp") or datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     message_id = payload.get("message_id") or f"ESP32-{machine_id}-{int(time.time() * 1000)}"
     status = str(payload.get("status", "RUNNING")).upper()
 
@@ -64,7 +64,7 @@ def ingest_esp32_telemetry(payload: dict) -> tuple[bool, dict, str]:
         "load": round(load, 1),
         "status": status,
         "production_count": prod_count,
-        "data_source": "ESP32_EDGE"
+        "data_source": data_source
     }
 
     # Deduplication check & Database Persistence
@@ -93,7 +93,7 @@ def ingest_esp32_telemetry(payload: dict) -> tuple[bool, dict, str]:
                 message_id, machine_id, timestamp, temperature, vibration, speed, load, status, production_count, data_source
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            message_id, machine_id, timestamp, temp, vib, speed, load, status, prod_count, "ESP32_EDGE"
+            message_id, machine_id, timestamp, temp, vib, speed, load, status, prod_count, data_source
         ))
         telemetry_id = cursor.lastrowid
 
@@ -134,7 +134,7 @@ def ingest_esp32_telemetry(payload: dict) -> tuple[bool, dict, str]:
         return True, {
             "telemetry_id": telemetry_id,
             "machine_id": machine_id,
-            "data_source": "ESP32_EDGE",
+            "data_source": data_source,
             "anomaly_score": anomaly_res["anomaly_score"],
             "risk_category": anomaly_res["risk_category"],
             "is_anomaly": anomaly_res["is_anomaly"],

@@ -1,4 +1,4 @@
-# Stage 11: Project Presentation Deck Structure (P_307)
+# Stage 11: Project Presentation Deck Structure 
 ## AI-Driven Digital Twin for Smart Factory Operations
 **Audience**: University Examination Committee, HCLTech Project Mentors & Evaluators  
 **Format**: 15 Slides with Speaker Notes and Technical Talking Points  
@@ -8,7 +8,7 @@
 
 ## Slide 1: Title Slide
 - **Title**: FactoryTwin: AI-Driven Digital Twin for Smart Factory Operations
-- **Subtitle**: BTech Capstone Project (P_307) | Embedded Systems, Industrial IoT & Machine Learning
+- **Subtitle**: BTech Capstone Project  | Embedded Systems, Industrial IoT & Machine Learning
 - **Author**: Senior BTech Developer / IoT Engineer
 - **Mentorship Framework**: HCLTech Project Creation Guide for Embedded Systems & IoT
 - **Speaker Note**: Welcome esteemed examiners and mentors. Today I am presenting FactoryTwin, an industrial digital twin and predictive maintenance platform that unifies cyber-physical physics simulation, real-time MQTT telemetry, unsupervised machine learning, and SCADA dashboard visualization.
@@ -160,7 +160,7 @@
 - **Title**: Automated Test Suite & Acceptance Results
 - **Key Points**:
   - 30 Automated Unit & Integration Tests across all 7 architectural layers.
-  - 100% Pass Rate (30/30 passed, 0 failures, 0 errors in 8.46 seconds).
+  - 100% Pass Rate (32/32 passed, 0 failures, 0 errors in 8.46 seconds).
   - Verified edge cases: malformed JSON, out-of-bounds readings, empty queries, duplicate message IDs.
   - Full compliance with all 20 measurable acceptance criteria defined in the project specification.
 - **Speaker Note**: Every single feature claimed in this project has been validated by an automated test case. Unexecuted tests were never marked as passed.

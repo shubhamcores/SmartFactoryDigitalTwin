@@ -1,5 +1,5 @@
 /*
- * FactoryTwin (P_307) - ESP32 Industrial Edge Telemetry Firmware
+ * FactoryTwin  - ESP32 Industrial Edge Telemetry Firmware
  * Target: ESP32 DevKit V1 (30-pin / 38-pin)
  * Sensors: MPU-6050 6-Axis IMU (I2C) & Internal / DS18B20 Temperature
  * Dual Transport Support:

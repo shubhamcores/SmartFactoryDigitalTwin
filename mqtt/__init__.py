@@ -1,4 +1,4 @@
 """
-MQTT Communication Package for FactoryTwin (P_307)
+MQTT Communication Package for FactoryTwin 
 Supports local MQTT brokers and HiveMQ Cloud via TLS.
 """

@@ -1,5 +1,5 @@
 """
-Master Test Runner for FactoryTwin (P_307)
+Master Test Runner for FactoryTwin 
 Discovers and executes all unit, integration, and security tests.
 Records actual results into tests/test_results.txt.
 """
@@ -16,7 +16,7 @@ sys.path.insert(0, str(BASE_DIR))
 
 def run_all_tests():
     print("=" * 80)
-    print(" FACTORYTWIN (P_307) - AUTOMATED VERIFICATION & TEST SUITE")
+    print(" FACTORYTWIN  - AUTOMATED VERIFICATION & TEST SUITE")
     print(f" Execution Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f" Python Environment:  {sys.version.split()[0]} on {sys.platform}")
     print("=" * 80 + "\n")
@@ -36,7 +36,7 @@ def run_all_tests():
 
     summary_text = f"""
 ================================================================================
-FACTORYTWIN (P_307) - FORMAL TEST EXECUTION REPORT
+FACTORYTWIN  - FORMAL TEST EXECUTION REPORT
 ================================================================================
 Timestamp:          {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 Test Runner:        Python unittest / Custom SCADA Harness

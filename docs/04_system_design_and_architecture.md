@@ -1,4 +1,4 @@
-# Stage 4: System Design & Architecture (P_307)
+# Stage 4: System Design & Architecture 
 ## Architectural Topology, Component Model & Data Flow Diagrams
 **Standard**: IEEE 1016 Software Design Description (SDD)  
 **Project Code**: P_307 | Version 1.0.0
@@ -128,7 +128,7 @@ graph TD
                        | <====== Operational CSV / PDF ======= |
                        | ======= Fault Injection Commands ===> |  FACTORYTWIN
                        |                                       |  DIGITAL TWIN
-                       |                                       |  PLATFORM (P_307)
+                       |                                       |  PLATFORM 
     [ESP32 / Edge Node]| ======= MQTT Telemetry JSON ========> |
                        |                                       |
     [HiveMQ Broker]    | <====== Telemetry Publish =========== |

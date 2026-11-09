@@ -1,5 +1,5 @@
 """
-Anomaly Inference Service for FactoryTwin (P_307)
+Anomaly Inference Service for FactoryTwin 
 Provides real-time machine telemetry evaluation using:
 1. Primary: Scikit-learn Isolation Forest model (Trained Unsupervised Detector)
 2. Fallback: Rule-Based Deterministic Boundary Detector (if model not trained)

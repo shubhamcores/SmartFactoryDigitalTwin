@@ -6,7 +6,7 @@ Main Flask Web Application and REST API Gateway.
 import os
 import sys
 import logging
-from datetime import datetime
+from datetime import datetime,timezone
 from pathlib import Path
 from flask import (
     Flask, render_template, request, redirect, url_for,
@@ -334,33 +334,95 @@ def create_app():
     # =========================================================================
     # REST APIs FOR DASHBOARD & INTEGRATIONS
     # =========================================================================
+    
+    
     @app.route("/api/telemetry/latest")
     @login_required
     def api_telemetry_latest():
-        """Retrieve most recent telemetry record and anomaly prediction for each machine."""
+        """Retrieve the latest telemetry matching each machine's selected data source."""
+
+        sim = get_simulator()
+        source_modes = sim.get_source_modes()
+
         conn = get_db_connection()
         cursor = conn.cursor()
 
         results = []
-        for m_id in Config.MACHINES.keys():
-            cursor.execute("""
-                SELECT t.*, a.anomaly_score, a.is_anomaly, a.risk_category, a.detection_method, a.suggested_action
-                FROM telemetry t
-                LEFT JOIN anomaly_predictions a ON a.telemetry_id = t.id
-                WHERE t.machine_id = ?
-                ORDER BY t.id DESC LIMIT 1
-            """, (m_id,))
-            row = cursor.fetchone()
-            if row:
-                results.append(dict(row))
+        waiting_for_data = []
 
-        conn.close()
-        sim = get_simulator()
+        try:
+            for m_id in Config.MACHINES.keys():
+
+                selected_mode = source_modes.get(m_id, "SYNTHETIC")
+
+                if selected_mode == "ESP32":
+
+                    cursor.execute("""
+                        SELECT
+                            t.*,
+                            a.anomaly_score,
+                            a.is_anomaly,
+                            a.risk_category,
+                            a.detection_method,
+                            a.suggested_action
+                        FROM telemetry t
+                        LEFT JOIN anomaly_predictions a
+                            ON a.telemetry_id = t.id
+                        WHERE t.machine_id = ?
+                            AND t.data_source = 'ESP32_TEST'
+                            AND datetime(t.timestamp) >= datetime('now', '-30 seconds')
+                        ORDER BY t.id DESC
+                        LIMIT 1
+                    """, (m_id,))
+
+                else:
+
+                    cursor.execute("""
+                        SELECT
+                            t.*,
+                            a.anomaly_score,
+                            a.is_anomaly,
+                            a.risk_category,
+                            a.detection_method,
+                            a.suggested_action
+                        FROM telemetry t
+                        LEFT JOIN anomaly_predictions a
+                            ON a.telemetry_id = t.id
+                        WHERE t.machine_id = ?
+                            AND t.data_source = 'SIMULATED'
+                            AND datetime(t.timestamp) >= datetime('now', '-30 seconds')
+                        ORDER BY t.id DESC
+                        LIMIT 1
+                    """, (m_id,))
+
+                row = cursor.fetchone()
+
+                if row:
+                    results.append(dict(row))
+
+                else:
+                    waiting_for_data.append({
+                        "machine_id": m_id,
+                        "source_mode": selected_mode,
+                        "message": (
+                            "Waiting for ESP32 data"
+                            if selected_mode == "ESP32"
+                            else "Waiting for synthetic data"
+                        )
+                    })
+
+        finally:
+            conn.close()
+
         return jsonify({
             "telemetry": results,
+            "source_modes": source_modes,
+            "waiting_for_data": waiting_for_data,
             "simulator_running": sim.is_running(),
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         })
+
+
 
     @app.route("/api/telemetry/history/<machine_id>")
     @login_required
@@ -565,10 +627,10 @@ def create_app():
             "load": load,
             "status": "WARNING" if (vib > 4.5 or temp > 85.0) else "RUNNING",
             "production_count": 125,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
         }
 
-        success, res, err = ingest_esp32_telemetry(sample_packet)
+        success, res, err = ingest_esp32_telemetry(sample_packet,data_source="ESP32_TEST")
         if success:
             return jsonify({
                 "success": True,

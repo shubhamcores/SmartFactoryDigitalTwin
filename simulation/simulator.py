@@ -1,6 +1,6 @@
 
 """
-Industrial Machine Digital Twin Simulator (P_307)
+Industrial Machine Digital Twin Simulator
 Simulates continuous factory operations for 4 machines:
   - Motor (Induction Motor)
   - Conveyor (Material Conveyor)
@@ -23,12 +23,13 @@ import time
 import random
 import logging
 import threading
-from datetime import datetime
+from datetime import datetime,timezone
 
 from database import get_db_connection
 from config import Config
 from ai_model.predict import get_anomaly_detector
 from services.alert_service import evaluate_telemetry_for_alerts
+from mqtt.publisher import MQTTPublisher
 
 logger = logging.getLogger(__name__)
 
@@ -144,7 +145,7 @@ class MachineState:
 
             return {
                 "machine_id": self.machine_id,
-                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
                 "temperature": round(float(self.temp), 2),
                 "vibration": round(float(self.vib), 3),
                 "speed": 0.0,
@@ -199,7 +200,7 @@ class MachineState:
 
         return {
             "machine_id": self.machine_id,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
             "temperature": round(float(self.temp), 2),
             "vibration": round(float(self.vib), 3),
             "speed": round(float(self.rpm), 1),
@@ -592,5 +593,22 @@ def get_simulator() -> SimulationEngine:
 
     if _simulator is None:
         _simulator = SimulationEngine()
+
+        if getattr(Config, "MQTT_ENABLED", False):
+            try:
+                publisher = MQTTPublisher()
+                publisher.connect()
+
+                _simulator.set_mqtt_publisher(publisher)
+
+                logger.info(
+                    "MQTT publisher initialized and attached to simulator."
+                )
+
+            except Exception as e:
+                logger.error(
+                    f"Failed to initialize MQTT publisher: {e}",
+                    exc_info=True
+                )
 
     return _simulator

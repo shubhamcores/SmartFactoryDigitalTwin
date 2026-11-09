@@ -1,5 +1,5 @@
 """
-Alert and Health Monitoring Service for FactoryTwin (P_307)
+Alert and Health Monitoring Service for FactoryTwin 
 Processes incoming machine telemetry and AI anomaly predictions, generates alerts,
 enforces cooldown deduplication, and manages operator acknowledgement and administrator resolution.
 """

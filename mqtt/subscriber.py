@@ -1,5 +1,5 @@
 """
-MQTT Subscriber Worker for FactoryTwin (P_307)
+MQTT Subscriber Worker for FactoryTwin 
 Subscribes to 'factory/machines/+/telemetry', validates incoming JSON schemas,
 deduplicates messages, persists live telemetry into SQLite, runs ML anomaly inference,
 and evaluates industrial safety alerts.
@@ -66,34 +66,52 @@ class MQTTSubscriber:
             self.is_connected = False
             logger.error(f"[MQTT] Subscriber connection failed with rc={rc_code}")
 
-    def _on_disconnect(self, client, userdata, rc, properties=None, reason_code=None):
+    def _on_disconnect(self, client, userdata, disconnect_flags, reason_code, properties):
         self.is_connected = False
-        logger.warning(f"[MQTT] Subscriber disconnected from broker (rc={rc})")
-
+        logger.warning(
+            f"[MQTT] Subscriber disconnected from broker "
+            f"(reason={reason_code})"
+       )
+    
     def _on_message(self, client, userdata, msg):
-        """Handle incoming telemetry message with validation and error containment."""
         try:
             payload_str = msg.payload.decode("utf-8")
         except Exception as e:
-            logger.warning(f"Failed to decode message bytes as UTF-8: {e}")
+            logger.warning(f"Failed to decode MQTT message: {e}")
             self.discarded_count += 1
             return
 
         is_valid, telemetry, err_msg = validate_telemetry_payload(payload_str)
+
         if not is_valid:
-            logger.warning(f"Discarded malformed MQTT message on {msg.topic}: {err_msg}")
+            logger.warning(f"Discarded malformed MQTT message: {err_msg}")
             self.discarded_count += 1
             return
 
         if not telemetry.get("timestamp"):
             telemetry["timestamp"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # Process and persist reading
+        logger.info(
+            f"MQTT MESSAGE RECEIVED | Machine: {telemetry['machine_id']} "
+            f"| Source: {telemetry.get('data_source', 'UNKNOWN')} "
+            f"| ID: {telemetry['message_id']}"
+        )
+
         try:
-            self._process_valid_telemetry(telemetry)
-            self.processed_count += 1
+            inserted = self._process_valid_telemetry(telemetry)
+
+            if inserted:
+                self.processed_count += 1
+                logger.info(
+                    f"MQTT TELEMETRY SAVED | Machine: {telemetry['machine_id']}"
+        )
+            else:
+                logger.info(
+                    f"MQTT DUPLICATE SKIPPED | ID: {telemetry['message_id']}"
+                )
+
         except Exception as e:
-            logger.error(f"Error persisting MQTT telemetry: {e}", exc_info=True)
+            logger.error(f"Error processing MQTT telemetry: {e}", exc_info=True)
 
     def _process_valid_telemetry(self, telemetry: dict):
         """Deduplicate, run AI inference, evaluate alerts, and store in SQLite."""
@@ -109,7 +127,7 @@ class MQTTSubscriber:
         if cursor.fetchone():
             logger.debug(f"Skipping duplicate message_id: {msg_id}")
             conn.close()
-            return
+            return False
 
         # AI Anomaly Inference
         anomaly_res = self._detector.predict(
@@ -173,6 +191,7 @@ class MQTTSubscriber:
 
         # Evaluate safety alerts
         evaluate_telemetry_for_alerts(telemetry, anomaly_res)
+        return True
 
     def start(self):
         """Connect and start background MQTT event loop."""

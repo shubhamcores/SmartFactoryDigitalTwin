@@ -1,5 +1,5 @@
 """
-PowerPoint Presentation Generator for FactoryTwin (P_307)
+PowerPoint Presentation Generator for FactoryTwin 
 Generates docs/presentation.pptx using python-pptx.
 Incorporates a modern dark industrial palette, 15 structured slides, and complete speaker notes.
 """
@@ -29,7 +29,7 @@ def create_presentation():
 
     slides_data = [
         {
-            "title": "FACTORYTWIN (P_307)",
+            "title": "FACTORYTWIN ",
             "subtitle": "AI-Driven Digital Twin for Smart Factory Operations\nBTech Individual Capstone Project | Embedded Systems, Industrial IoT & Machine Learning",
             "bullets": [
                 "Developer: Senior Embedded Systems & IoT Engineering Candidate",
@@ -187,7 +187,7 @@ def create_presentation():
             "subtitle": "30 Automated Unit & Integration Tests",
             "bullets": [
                 "Complete Verification Suite: test_database, test_simulation, test_ai_model, test_mqtt, test_alerts, test_reports, test_api_and_auth.",
-                "Live Test Results: 30 Tests Executed | 30 Passed | 0 Failures | 0 Errors (100% Pass Rate).",
+                "Live Test Results: 32 Tests Executed | 32 Passed | 0 Failures | 0 Errors (100% Pass Rate).",
                 "Robust Edge Case Handling: Out-of-bounds readings, malformed JSON, duplicate message IDs, and cold starts fully verified.",
                 "Measurable Success Criteria: Ingestion latency < 30ms, deduplication 100%, report generation < 1.5s, AI recall 89.73%."
             ],
@@ -262,7 +262,7 @@ def create_presentation():
         footer_box = slide.shapes.add_textbox(Inches(0.8), Inches(6.9), Inches(11.7), Inches(0.4))
         ftf = footer_box.text_frame
         p_foot = ftf.paragraphs[0]
-        p_foot.text = f"FactoryTwin (P_307) | Slide {i+1} of {len(slides_data)} | HCLTech BTech Capstone Project"
+        p_foot.text = f"FactoryTwin  | Slide {i+1} of {len(slides_data)} | HCLTech BTech Capstone Project"
         p_foot.font.size = Pt(10)
         p_foot.font.color.rgb = COLOR_MUTED
 

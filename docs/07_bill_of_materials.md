@@ -1,4 +1,4 @@
-# Stage 7: Bill of Materials & Cost Analysis (P_307)
+# Stage 7: Bill of Materials & Cost Analysis 
 ## Optional Industrial IoT Edge Sensing Node
 **Currency**: Indian Rupee (INR - ₹)  
 **Target Hardware**: ESP32 DevKit V1 Edge Node with MPU-6050 Accelerometer / Gyroscope

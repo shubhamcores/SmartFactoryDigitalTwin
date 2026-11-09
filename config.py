@@ -1,5 +1,5 @@
 """
-Configuration Module for FactoryTwin (P_307)
+Configuration Module for FactoryTwin 
 AI-Driven Digital Twin for Smart Factory Operations
 """
 

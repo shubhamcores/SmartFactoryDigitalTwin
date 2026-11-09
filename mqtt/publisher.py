@@ -1,5 +1,5 @@
 """
-MQTT Publisher Service for FactoryTwin (P_307)
+MQTT Publisher Service for FactoryTwin 
 Publishes real-time telemetry from machines or simulated edge nodes to the MQTT broker
 (Supports local Mosquitto or HiveMQ Cloud TLS).
 """

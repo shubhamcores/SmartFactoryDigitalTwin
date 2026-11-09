@@ -1,4 +1,4 @@
-# Stage 6: MQTT Industrial Communication & HiveMQ Guide (P_307)
+# Stage 6: MQTT Industrial Communication & HiveMQ Guide 
 ## Topic Hierarchies, Cloud Broker Setup & MQTT Explorer Testing
 **Standard**: OASIS MQTT v3.1.1 / v5.0 Specification  
 **Default Topic Prefix**: `factory/machines/`

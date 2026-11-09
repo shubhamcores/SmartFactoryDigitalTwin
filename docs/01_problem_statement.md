@@ -1,4 +1,4 @@
-# Stage 1: Problem Statement & Industrial Motivation (P_307)
+# Stage 1: Problem Statement & Industrial Motivation 
 ## Project Title: AI-Driven Digital Twin for Smart Factory Operations
 **Academic Track**: BTech Embedded Systems, Industrial IoT & Machine Learning  
 **Development Framework**: HCLTech Project Creation Guide for Embedded Systems & IoT  

@@ -1,4 +1,4 @@
-# Stage 9: Comprehensive User Manual (P_307)
+# Stage 9: Comprehensive User Manual 
 ## Plant Operator & Administrator Operational Guide
 **Platform**: FactoryTwin Industrial SCADA & Digital Twin (Version 1.0.0)
 
@@ -15,7 +15,7 @@
 Open your command terminal (PowerShell or Command Prompt) and navigate to the project directory:
 
 ```powershell
-cd g:\DigitalTwinForFactory
+cd g:\SmartFactoryDigitalTwin
 
 # (Optional) Create virtual environment if starting from fresh install
 python -m venv .venv
@@ -30,7 +30,7 @@ python -m venv .venv
 Upon launch, the terminal displays:
 ```
 ======================================================================
- FACTORYTWIN (P_307) - SMART FACTORY SCADA & DIGITAL TWIN
+ FACTORYTWIN  - SMART FACTORY SCADA & DIGITAL TWIN
  Web Dashboard: http://127.0.0.1:5000
  Default Administrator: admin / Admin@12345
  Default Plant Operator: operator / Operator@12345

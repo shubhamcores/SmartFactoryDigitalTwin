@@ -1,4 +1,4 @@
-# Hardware Bill of Materials (BOM) & Cost Estimation (P_307)
+# Hardware Bill of Materials (BOM) & Cost Estimation 
 
 ## 1. Component Procurement List
 

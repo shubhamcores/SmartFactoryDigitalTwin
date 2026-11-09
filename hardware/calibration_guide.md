@@ -1,4 +1,4 @@
-# MPU-6050 Calibration & Vibration Signal Processing Guide (P_307)
+# MPU-6050 Calibration & Vibration Signal Processing Guide 
 
 ## 1. Principles of Industrial Vibration Sensing
 Industrial predictive maintenance standards (such as **ISO 10816-3**) evaluate machine vibration severity in **velocity RMS (mm/s)** over the frequency bandwidth from 10 Hz to 1,000 Hz.

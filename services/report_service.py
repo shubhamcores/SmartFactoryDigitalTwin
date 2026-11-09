@@ -1,5 +1,5 @@
 """
-Automated Reporting Service for FactoryTwin (P_307)
+Automated Reporting Service for FactoryTwin 
 Generates Excel-compatible CSV reports and styled PDF executive reports with ReportLab.
 Includes metadata, date range filters, summary statistics, and audit logging into report_events.
 """

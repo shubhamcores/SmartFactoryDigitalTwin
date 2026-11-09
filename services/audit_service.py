@@ -1,5 +1,5 @@
 """
-Audit Logging Service for FactoryTwin (P_307)
+Audit Logging Service for FactoryTwin 
 Maintains tamper-evident operational and administrative audit trails in SQLite.
 """
 

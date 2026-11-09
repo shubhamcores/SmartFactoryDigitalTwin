@@ -1,5 +1,5 @@
 """
-Unit Tests for Machine Learning Anomaly Detection (P_307)
+Unit Tests for Machine Learning Anomaly Detection 
 """
 
 import unittest

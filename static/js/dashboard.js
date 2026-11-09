@@ -1,5 +1,5 @@
 /**
- * FactoryTwin (P_307) - Central SCADA Dashboard Controller
+ * FactoryTwin  - Central SCADA Dashboard Controller
  * Real-time asynchronous polling, Chart.js telemetry visualization,
  * digital twin status updates, and interactive alert management.
  */
@@ -16,11 +16,17 @@ const MACHINE_COLORS = {
 };
 
 const MONITORED_MACHINES = ["Motor", "Conveyor", "Pump", "CNC"];
-
+const MACHINE_ID_MAP = {
+    "Motor_1": "Motor",
+    "Conveyor_1": "Conveyor",
+    "Pump_1": "Pump",
+    "CNC_1": "CNC"
+};
 const MAX_HISTORY_POINTS = 20;
 
 // Chart Instances
 let chartTemp, chartVib, chartSpeed, chartProd;
+let previousSourceModes = null;
 
 // Telemetry Time-Series Buffers
 const timeLabels = [];
@@ -127,19 +133,90 @@ function initCharts() {
     }
 }
 
+function clearAllChartHistory() {
+    timeLabels.length = 0;
+
+    MONITORED_MACHINES.forEach(mId => {
+        const buffer = telemetryBuffers[mId];
+
+        if (buffer) {
+            buffer.temp.length = 0;
+            buffer.vib.length = 0;
+            buffer.speed.length = 0;
+            buffer.prod.length = 0;
+        }
+    });
+}
+
+function clearMachineDisplay(mId, mode) {
+    ["temp", "vib", "rpm", "load", "prod", "risk-score", "risk-method"]
+        .forEach(metric => {
+            updateElementText(`val-${metric}-${mId}`, "--");
+        });
+
+    const badge = document.getElementById(`badge-status-${mId}`);
+
+    if (badge) {
+        badge.textContent = "WAITING";
+        badge.className = "badge-scada badge-scada-idle";
+    }
+
+    const srcBadge = document.getElementById(`badge-source-${mId}`);
+
+    if (srcBadge) {
+        srcBadge.textContent = mode === "ESP32" ? "ESP32" : "SIM";
+        srcBadge.className = mode === "ESP32"
+            ? "badge bg-success text-white font-monospace"
+            : "badge bg-dark border border-secondary text-info font-monospace";
+    }
+
+    const riskBadge = document.getElementById(`badge-risk-${mId}`);
+
+    if (riskBadge) {
+        riskBadge.textContent = "--";
+        riskBadge.className = "badge bg-secondary";
+    }
+
+    const riskBar = document.getElementById(`risk-bar-${mId}`);
+
+    if (riskBar) {
+        riskBar.style.width = "0%";
+    }
+}
+
+
 async function fetchDashboardTelemetry() {
     try {
-        const res = await fetch("/api/telemetry/latest");
+        const res = await fetch("/api/telemetry/latest", {
+            cache: "no-store"
+        });
+
         if (!res.ok) return;
 
         const data = await res.json();
+
         const telemetryList = data.telemetry || [];
+        const sourceModes = data.source_modes || {};
+
+        const modesChanged = previousSourceModes !== null &&
+            MONITORED_MACHINES.some(mId =>
+                (sourceModes[mId] || "SYNTHETIC") !==
+                (previousSourceModes[mId] || "SYNTHETIC")
+            );
+
+        // Reset chart history whenever a source mode changes.
+        if (modesChanged) {
+            clearAllChartHistory();
+        }
+
+        previousSourceModes = { ...sourceModes };
+
         const simRunning = data.simulator_running;
         const nowTime = new Date().toLocaleTimeString();
 
-        // Update Simulator Pulse Pill
         const pulseDot = document.getElementById("simulator-pulse");
         const statusText = document.getElementById("simulator-status-text");
+
         if (pulseDot && statusText) {
             if (simRunning) {
                 pulseDot.className = "status-dot status-dot-pulse bg-success";
@@ -151,50 +228,67 @@ async function fetchDashboardTelemetry() {
         }
 
         const lastSync = document.getElementById("last-updated-time");
-        if (lastSync) lastSync.textContent = nowTime;
+
+        if (lastSync) {
+            lastSync.textContent = nowTime;
+        }
 
         let runningCount = 0;
         let warningCount = 0;
         let stoppedCount = 0;
-        let lastSource = "SIMULATED";
 
-        // Push time label
+        const receivedMachines = new Set();
+
         if (telemetryList.length > 0) {
             timeLabels.push(nowTime);
-            if (timeLabels.length > MAX_HISTORY_POINTS) timeLabels.shift();
+
+            if (timeLabels.length > MAX_HISTORY_POINTS) {
+                timeLabels.shift();
+            }
         }
 
-        telemetryList.forEach(item => {
-            const normMap = { "Motor_1": "Motor", "Conveyor_1": "Conveyor", "Pump_1": "Pump", "CNC_1": "CNC" };
-            const mId = normMap[item.machine_id] || item.machine_id;
-            lastSource = item.data_source || "SIMULATED";
+        const normMap = {
+            "Motor_1": "Motor",
+            "Conveyor_1": "Conveyor",
+            "Pump_1": "Pump",
+            "CNC_1": "CNC"
+        };
 
-            // Count statuses
+        telemetryList.forEach(item => {
+            const mId = normMap[item.machine_id] || item.machine_id;
+
+            if (!MONITORED_MACHINES.includes(mId)) return;
+
+            receivedMachines.add(mId);
+
             const st = (item.status || "RUNNING").toUpperCase();
+
             if (st === "RUNNING") runningCount++;
             else if (st === "WARNING" || st === "IDLE") warningCount++;
             else stoppedCount++;
 
-            // Update DOM Card Elements
-            updateElementText(`val-temp-${mId}`, item.temperature?.toFixed(1));
-            updateElementText(`val-vib-${mId}`, item.vibration?.toFixed(2));
+            updateElementText(`val-temp-${mId}`, Number(item.temperature).toFixed(1));
+            updateElementText(`val-vib-${mId}`, Number(item.vibration).toFixed(2));
             updateElementText(`val-rpm-${mId}`, Math.round(item.speed));
-            updateElementText(`val-load-${mId}`, item.load?.toFixed(0));
+            updateElementText(`val-load-${mId}`, Number(item.load).toFixed(0));
             updateElementText(`val-prod-${mId}`, item.production_count);
 
-            // Update Status Badge
             const badge = document.getElementById(`badge-status-${mId}`);
+
             if (badge) {
                 badge.textContent = st;
                 badge.className = `badge-scada badge-scada-${st.toLowerCase()}`;
             }
 
-            // Update Machine Source Badge
             const srcBadge = document.getElementById(`badge-source-${mId}`);
+
             if (srcBadge) {
                 if (item.data_source === "ESP32_EDGE") {
                     srcBadge.textContent = "ESP32";
                     srcBadge.className = "badge bg-success text-white font-monospace";
+                } else if (item.data_source === "ESP32_TEST") {
+                    srcBadge.textContent = "ESP32 TEST";
+                    srcBadge.className = "badge bg-warning text-dark font-monospace";
                 } else if (item.data_source === "MQTT_LIVE") {
                     srcBadge.textContent = "MQTT";
                     srcBadge.className = "badge bg-info text-dark font-monospace";
@@ -204,56 +298,90 @@ async function fetchDashboardTelemetry() {
                 }
             }
 
-            // Update AI Risk Gauge
-            const riskScore = item.anomaly_score ?? 15.0;
+            const riskScore = Number(item.anomaly_score ?? 15);
             const riskCategory = item.risk_category || "LOW";
-            const detectionMethod = item.detection_method === "RULE_BASED_FALLBACK" ? "Rule Engine" : "Isolation Forest";
+
+            const detectionMethod =
+                item.detection_method === "RULE_BASED_FALLBACK"
+                    ? "Rule Engine"
+                    : "Isolation Forest";
 
             updateElementText(`val-risk-score-${mId}`, riskScore.toFixed(1));
             updateElementText(`val-risk-method-${mId}`, detectionMethod);
 
             const riskBadge = document.getElementById(`badge-risk-${mId}`);
+
             if (riskBadge) {
                 riskBadge.textContent = riskCategory;
                 riskBadge.className = `badge bg-${getRiskColorClass(riskCategory)}`;
             }
 
             const riskBar = document.getElementById(`risk-bar-${mId}`);
+
             if (riskBar) {
-                riskBar.style.width = `${Math.min(100, Math.max(5, riskScore))}%`;
-                riskBar.className = `risk-bar risk-bar-${riskCategory.toLowerCase()}`;
+                riskBar.style.width =
+                    `${Math.min(100, Math.max(5, riskScore))}%`;
+
+                riskBar.className =
+                    `risk-bar risk-bar-${riskCategory.toLowerCase()}`;
             }
 
-            // Append to Chart Buffers
-            if (telemetryBuffers[mId]) {
-                const b = telemetryBuffers[mId];
-                b.temp.push(item.temperature);
-                b.vib.push(item.vibration);
-                b.speed.push(item.speed);
-                b.prod.push(item.production_count);
+            const buffer = telemetryBuffers[mId];
 
-                if (b.temp.length > MAX_HISTORY_POINTS) {
-                    b.temp.shift();
-                    b.vib.shift();
-                    b.speed.shift();
-                    b.prod.shift();
+            if (buffer) {
+                buffer.temp.push(item.temperature);
+                buffer.vib.push(item.vibration);
+                buffer.speed.push(item.speed);
+                buffer.prod.push(item.production_count);
+
+                if (buffer.temp.length > MAX_HISTORY_POINTS) {
+                    buffer.temp.shift();
+                    buffer.vib.shift();
+                    buffer.speed.shift();
+                    buffer.prod.shift();
                 }
             }
         });
 
-        // Update KPIs
+        // Machines without matching source data must not show old readings.
+        MONITORED_MACHINES.forEach(mId => {
+            if (!receivedMachines.has(mId)) {
+                const mode = sourceModes[mId] || "SYNTHETIC";
+                clearMachineDisplay(mId, mode);
+            }
+        });
+
         updateElementText("kpi-running-machines", runningCount);
         updateElementText("kpi-warning-machines", warningCount);
         updateElementText("kpi-stopped-machines", stoppedCount);
+
+        const selectedModes = MONITORED_MACHINES.map(
+            mId => sourceModes[mId] || "SYNTHETIC"
+        );
+
+        const allESP32 = selectedModes.every(mode => mode === "ESP32");
+        const allSynthetic = selectedModes.every(mode => mode === "SYNTHETIC");
+
+        const lastSource = allESP32
+            ? "ESP32_EDGE"
+            : allSynthetic
+                ? "SIMULATED"
+                : "HYBRID";
+
         updateElementText("kpi-data-source", lastSource);
 
         const navSource = document.getElementById("nav-data-source");
+
         if (navSource) {
             navSource.textContent = lastSource;
-            navSource.className = lastSource === "MQTT_LIVE" ? "badge bg-success text-white" : "badge bg-primary text-white";
+            navSource.className =
+                lastSource === "ESP32_EDGE"
+                    ? "badge bg-success text-white"
+                    : lastSource === "SIMULATED"
+                        ? "badge bg-primary text-white"
+                        : "badge bg-info text-dark";
         }
 
-        // Update Charts
         if (chartTemp) chartTemp.update("none");
         if (chartVib) chartVib.update("none");
         if (chartSpeed) chartSpeed.update("none");
@@ -263,6 +391,7 @@ async function fetchDashboardTelemetry() {
         console.error("Dashboard telemetry sync error:", err);
     }
 }
+
 
 async function fetchRecentAlerts() {
     try {
