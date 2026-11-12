@@ -54,7 +54,7 @@ class NumberedCanvas(canvas.Canvas):
         self.line(40, 30, page_width - 40, 30)
 
         # Footer text
-        self.drawString(40, 18, f"FactoryTwin P_307 - Confidential Factory Operations Report | Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        self.drawString(40, 18, f"FactoryTwin  - Confidential Factory Operations Report | Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         page_text = f"Page {self._pageNumber} of {page_count}"
         self.drawRightString(page_width - 40, 18, page_text)
         self.restoreState()

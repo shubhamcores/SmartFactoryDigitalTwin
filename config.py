@@ -39,7 +39,7 @@ class Config:
     # Project Metadata
     PROJECT_NAME = "FactoryTwin"
     PROJECT_TITLE = "AI-Driven Digital Twin for Smart Factory Operations"
-    PROJECT_CODE = "P_307"
+    PROJECT_CODE = ""
     VERSION = "1.0.0"
 
     # Base Paths
