@@ -6,6 +6,31 @@
 
 *Simulate factory machines, detect anomalies with machine learning, and watch it all on a live dashboard.*
 
+<div align="center">
+
+<h2>🚀 Live Project Demo</h2>
+
+<p>
+  Experience the Smart Factory Digital Twin in action.
+</p>
+
+<a href="https://smartfactory.charrons.net/" target="_blank">
+  <img
+    src="https://img.shields.io/badge/🌐_OPEN_LIVE_DASHBOARD-Visit%20Project-0D9488?style=for-the-badge"
+    alt="Open Live Dashboard"
+  />
+</a>
+
+<p>
+  <b>Live URL:</b>
+  <a href="https://smartfactory.charrons.net/">
+    smartfactory.charrons.net
+  </a>
+</p>
+
+</div>
+
+
 <br>
 
 ![Python](https://img.shields.io/badge/Python-3-3776AB?style=for-the-badge&logo=python&logoColor=white)
@@ -533,9 +558,7 @@ SmartFactoryDigitalTwin/
 
 ---
 
-## 📜 License
 
-Released under the MIT License.
 
 <div align="center">
 <sub>Built as a BTech capstone project · Flask · scikit-learn · SQLite · MQTT</sub>
