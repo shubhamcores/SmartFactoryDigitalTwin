@@ -8,7 +8,7 @@
 
 <div align="center">
 
-<h2>🚀 Live Project Demo</h2>
+<h2>🚀 Live Dashboard</h2>
 
 <p>
   Experience the Smart Factory Digital Twin in action.
@@ -16,7 +16,7 @@
 
 <a href="https://smartfactory.charrons.net/" target="_blank">
   <img
-    src="https://img.shields.io/badge/🌐_OPEN_LIVE_DASHBOARD-Visit%20Project-0D9488?style=for-the-badge"
+    src="https://img.shields.io/badge/
     alt="Open Live Dashboard"
   />
 </a>
