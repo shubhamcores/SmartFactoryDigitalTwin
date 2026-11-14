@@ -6,6 +6,29 @@
 
 *Simulate factory machines, detect anomalies with machine learning, and watch it all on a live dashboard.*
 
+
+<br>
+
+![Python](https://img.shields.io/badge/Python-3-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-Backend-000000?style=for-the-badge&logo=flask&logoColor=white)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-Isolation_Forest-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-WAL-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
+![MQTT](https://img.shields.io/badge/MQTT-Paho-660066?style=for-the-badge&logo=mqtt&logoColor=white)
+[![Tests](https://img.shields.io/badge/Tests-32%20passing-2EA44F?style=for-the-badge)](tests/test_results.txt)
+![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
+
+<br>
+
+[**Overview**](#-overview) •
+[**Features**](#-features) •
+[**Architecture**](#-architecture) •
+[**Quick Start**](#-quick-start) •
+[**API**](#-rest-api) •
+[**Hardware**](#-optional-esp32-hardware) •
+[**Limitations**](#-limitations)
+
+</div>
+
 <div align="center">
 
 <h2>🚀 Live Dashboard</h2>
@@ -30,28 +53,6 @@
 
 </div>
 
-
-<br>
-
-![Python](https://img.shields.io/badge/Python-3-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Flask](https://img.shields.io/badge/Flask-Backend-000000?style=for-the-badge&logo=flask&logoColor=white)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-Isolation_Forest-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-WAL-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
-![MQTT](https://img.shields.io/badge/MQTT-Paho-660066?style=for-the-badge&logo=mqtt&logoColor=white)
-[![Tests](https://img.shields.io/badge/Tests-32%20passing-2EA44F?style=for-the-badge)](tests/test_results.txt)
-![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
-
-<br>
-
-[**Overview**](#-overview) •
-[**Features**](#-features) •
-[**Architecture**](#-architecture) •
-[**Quick Start**](#-quick-start) •
-[**API**](#-rest-api) •
-[**Hardware**](#-optional-esp32-hardware) •
-[**Limitations**](#-limitations)
-
-</div>
 
 ---
 
