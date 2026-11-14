@@ -16,7 +16,7 @@
 
 <a href="https://smartfactory.charrons.net/" target="_blank">
   <img
-    src="https://img.shields.io/badge/
+    src="https://img.shields.io/badge/🌐_OPEN_LIVE_DASHBOARD-0D9488?style=for-the-badge"
     alt="Open Live Dashboard"
   />
 </a>
