@@ -188,68 +188,218 @@ Trained on 12,000 normal samples ([`data/normal_training_data.csv`](data/normal_
 
 ---
 
-## 🚀 Quick Start
+## ⚙️ Installation and Local Setup
 
-**Requirements:** Python 3 and `pip`. The project was developed and its tests last run on Python 3.12.10 on Windows; other versions are untested.
+### Prerequisites
 
-### 1. Get the code
+- Python 3.10+
+- Git
+- pip
+- Linux, Windows, or macOS
+
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/shubhamcores/SmartFactoryDigitalTwin.git
 cd SmartFactoryDigitalTwin
 ```
 
-### 2. Install dependencies
+### 2. Create a Virtual Environment
 
 ```bash
-pip install -r requirements.txt
-
-# Only needed for MQTT features
-pip install -r requirements-mqtt.txt
+python3 -m venv .venv
 ```
 
-### 3. Set up the database
+### 3. Activate the Virtual Environment
+
+**Linux / macOS:**
+
+```bash
+source .venv/bin/activate
+```
+
+**Windows PowerShell:**
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+### 4. Install Dependencies
+
+```bash
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+### 5. Configure Environment Variables
+
+Use `.env.example` as a reference and configure the required environment variables.
+
+Keep secret keys, MQTT credentials, and other sensitive configuration private.
+
+### 6. Initialize the Database
 
 ```bash
 python database.py
 ```
 
-Add `--reset` to start over with fresh data.
-
-### 4. Run the app
+### 7. Run the Application
 
 ```bash
 python app.py
 ```
 
-Open **<http://127.0.0.1:5000>** in your browser.
+Open the application:
 
-> 💡 On Windows, if `python` or `pip` is not recognised, try `py` and `py -m pip`.
-
-<details>
-<summary><b>Optional: regenerate the datasets and retrain the model</b></summary>
-
-<br>
-
-The repository already includes a trained model and datasets. To rebuild them:
-
-```bash
-python ai_model/generate_dataset.py
-python ai_model/train_model.py
+```text
+http://127.0.0.1:5000
 ```
 
-</details>
+To deactivate the virtual environment:
 
-<details>
-<summary><b>Optional: configure MQTT and environment settings</b></summary>
-
-<br>
-
-Copy [`.env.example`](.env.example) to `.env` and edit it for your environment. The MQTT broker is configurable and not tied to one provider. Keep your real `.env` out of version control.
-
-</details>
+```bash
+deactivate
+```
 
 ---
+
+## ☁️ Linux VPS Deployment
+
+The application is deployed on a Linux VPS using Python, a dedicated virtual environment, Flask, and Gunicorn.
+
+### Deployment Architecture
+
+```text
+GitHub Repository
+       |
+       v
+Linux VPS
+       |
+       v
+Python Virtual Environment (.venv)
+       |
+       v
+Project Dependencies
+       |
+       v
+SQLite Database
+       |
+       v
+Gunicorn WSGI Server
+       |
+       v
+Flask Application
+       |
+       v
+Web Dashboard
+```
+
+### 1. Connect to the VPS
+
+```bash
+ssh username@YOUR_SERVER_IP
+```
+
+### 2. Install System Requirements
+
+For Ubuntu or Debian:
+
+```bash
+sudo apt update
+sudo apt install python3 python3-pip python3-venv git -y
+```
+
+### 3. Clone the Repository
+
+```bash
+git clone https://github.com/shubhamcores/SmartFactoryDigitalTwin.git
+cd SmartFactoryDigitalTwin
+```
+
+### 4. Create the Virtual Environment
+
+```bash
+python3 -m venv .venv
+```
+
+### 5. Activate the Virtual Environment
+
+```bash
+source .venv/bin/activate
+```
+
+### 6. Upgrade pip and Install Dependencies
+
+```bash
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+### 7. Configure Environment Variables
+
+Configure the required application settings and MQTT broker credentials.
+
+Do not commit production secrets or `.env` files to GitHub.
+
+### 8. Initialize the Database
+
+```bash
+python database.py
+```
+
+### 9. Start the Application Using Gunicorn
+
+```bash
+gunicorn --bind 0.0.0.0:8870 wsgi:app
+```
+
+The application will listen on port `8870`.
+
+### 10. Access the Application
+
+```text
+http://YOUR_SERVER_IP:8870
+```
+
+### 11. Run Gunicorn Using the Virtual Environment
+
+For deployment, use the Gunicorn executable inside `.venv`:
+
+```bash
+.venv/bin/gunicorn --bind 0.0.0.0:8870 wsgi:app
+```
+
+This ensures the application uses the dependencies installed in its project-specific virtual environment.
+
+### Deployment Notes
+
+- Keep `.venv` on the VPS.
+- Do not upload `.venv` to GitHub.
+- Use `requirements.txt` to reproduce the Python environment.
+- Configure the VPS firewall for the application port.
+- Use a process manager such as systemd to keep Gunicorn running.
+- Configure HTTPS through a reverse proxy for production access.
+- Back up the SQLite database regularly.
+- Store MQTT credentials and application secrets securely.
+
+---
+
+## 📦 Python Environment Management
+
+The project uses a dedicated Python virtual environment named `.venv` to isolate its dependencies from the system-wide Python installation.
+
+| Operation | Command |
+|---|---|
+| Create environment | `python3 -m venv .venv` |
+| Activate on Linux | `source .venv/bin/activate` |
+| Activate on Windows | `.venv\Scripts\Activate.ps1` |
+| Upgrade pip | `python -m pip install --upgrade pip` |
+| Install dependencies | `pip install -r requirements.txt` |
+| Run application | `python app.py` |
+| Run Gunicorn | `.venv/bin/gunicorn --bind 0.0.0.0:8870 wsgi:app` |
+| Deactivate | `deactivate` |
+
+The `.venv/` directory is excluded from version control through `.gitignore`. Only the dependency specification is maintained in the repository.
 
 ## 🖥 Using the Dashboard
 
